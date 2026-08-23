@@ -7,6 +7,7 @@ function EditableText({ value, onSave, isAdmin, multiline = false, className = "
   const inputRef = useRef(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTempValue(value);
   }, [value]);
 

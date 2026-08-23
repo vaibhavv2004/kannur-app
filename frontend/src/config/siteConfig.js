@@ -17,11 +17,6 @@ const siteConfig = {
     youtube: "https://youtube.com",
     whatsapp: "https://wa.me/914972701234",
   },
-
-  adminCredentials: {
-    username: "admin",
-    password: "password123",
-  },
 };
 
 export default siteConfig;

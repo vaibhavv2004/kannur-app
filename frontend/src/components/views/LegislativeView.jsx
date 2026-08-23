@@ -1,4 +1,4 @@
-import { Award, BookOpen, CheckCircle, Search, HelpCircle } from "lucide-react";
+import { Award, BookOpen, Search, HelpCircle } from "lucide-react";
 
 function LegislativeView({ attendance, questions }) {
   const attendancePercentage = attendance.totalSessions > 0

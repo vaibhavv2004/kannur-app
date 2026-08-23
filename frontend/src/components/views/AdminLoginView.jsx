@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Shield, Eye, EyeOff, Lock, User, AlertCircle } from "lucide-react";
 import siteConfig from "../../config/siteConfig";
+import { api } from "../../lib/api";
 
 function AdminLoginView({ onLoginSuccess }) {
   const [form, setForm] = useState({ username: "", password: "" });
@@ -13,21 +14,19 @@ function AdminLoginView({ onLoginSuccess }) {
     setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    // Simulate a brief delay for UX
-    setTimeout(() => {
-      const { username, password } = siteConfig.adminCredentials;
-      if (form.username === username && form.password === password) {
-        onLoginSuccess();
-      } else {
-        setError("Invalid username or password. Please try again.");
-      }
+    try {
+      const { access_token } = await api.post("/api/auth/admin/login", form);
+      onLoginSuccess(access_token);
+    } catch {
+      setError("Invalid username or password. Please try again.");
+    } finally {
       setIsLoading(false);
-    }, 700);
+    }
   };
 
   return (

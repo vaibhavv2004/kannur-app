@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { developmentProjects } from "../../constants/data";
-import { Hammer, CircleCheck, Clock, ShieldAlert } from "lucide-react";
+import { CircleCheck, Clock, ShieldAlert } from "lucide-react";
 import EditableText from "../common/EditableText";
 
 function DevelopmentView({ isAdmin }) {

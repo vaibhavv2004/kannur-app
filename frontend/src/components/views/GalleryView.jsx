@@ -1,16 +1,26 @@
-import { useState } from "react";
-import { galleryItems } from "../../constants/data";
-import { X, ZoomIn } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, ZoomIn, PlayCircle } from "lucide-react";
+import { api } from "../../lib/api";
+
+function extractYouTubeId(url) {
+  const match = url.match(/(?:youtu\.be\/|v=|\/embed\/)([a-zA-Z0-9_-]{11})/);
+  return match ? match[1] : "";
+}
 
 function GalleryView() {
+  const [items, setItems] = useState([]);
   const [filter, setFilter] = useState("All");
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
 
-  const categories = ["All", "Education", "Development", "Community", "Tourism", "Agriculture"];
+  useEffect(() => {
+    api.get("/api/gallery").then(setItems).catch(() => setItems([]));
+  }, []);
+
+  const categories = ["All", ...Array.from(new Set(items.map(item => item.category)))];
 
   const filteredItems = filter === "All"
-    ? galleryItems
-    : galleryItems.filter(item => item.category === filter);
+    ? items
+    : items.filter(item => item.category === filter);
 
   return (
     <div className="space-y-8 py-8">
@@ -42,19 +52,18 @@ function GalleryView() {
         {filteredItems.map((item) => (
           <div
             key={item.id}
-            onClick={() => setSelectedImage(item)}
+            onClick={() => setSelectedItem(item)}
             className="group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xs hover:shadow-md transition duration-300"
           >
             <div className="relative h-64 overflow-hidden">
               <img
-                src={item.url}
+                src={item.media_type === "video" ? `https://img.youtube.com/vi/${extractYouTubeId(item.url)}/hqdefault.jpg` : item.url}
                 alt={item.title}
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              {/* Overlay */}
               <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30">
-                  <ZoomIn className="h-6 w-6" />
+                  {item.media_type === "video" ? <PlayCircle className="h-6 w-6" /> : <ZoomIn className="h-6 w-6" />}
                 </div>
               </div>
             </div>
@@ -67,24 +76,36 @@ function GalleryView() {
       </div>
 
       {/* Lightbox Modal */}
-      {selectedImage && (
+      {selectedItem && (
         <div className="fixed inset-0 z-55 flex items-center justify-center bg-slate-950/90 p-4 animate-in fade-in duration-200">
           <button
-            onClick={() => setSelectedImage(null)}
+            onClick={() => setSelectedItem(null)}
             className="absolute top-4 right-4 text-white/70 hover:text-white rounded-full bg-white/10 p-2 cursor-pointer transition"
           >
             <X className="h-6 w-6" />
           </button>
-          
+
           <div className="max-w-4xl w-full flex flex-col items-center space-y-4">
-            <img
-              src={selectedImage.url}
-              alt={selectedImage.title}
-              className="max-h-[75vh] w-auto object-contain rounded-lg shadow-2xl border border-white/10"
-            />
+            {selectedItem.media_type === "video" ? (
+              <div className="w-full aspect-video rounded-lg shadow-2xl border border-white/10 overflow-hidden">
+                <iframe
+                  className="w-full h-full"
+                  src={`https://www.youtube.com/embed/${extractYouTubeId(selectedItem.url)}`}
+                  title={selectedItem.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            ) : (
+              <img
+                src={selectedItem.url}
+                alt={selectedItem.title}
+                className="max-h-[75vh] w-auto object-contain rounded-lg shadow-2xl border border-white/10"
+              />
+            )}
             <div className="text-center text-white space-y-1">
-              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">{selectedImage.category}</span>
-              <h3 className="text-lg font-bold">{selectedImage.title}</h3>
+              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">{selectedItem.category}</span>
+              <h3 className="text-lg font-bold">{selectedItem.title}</h3>
             </div>
           </div>
         </div>

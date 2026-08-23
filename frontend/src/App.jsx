@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
 import HomeView from "./components/views/HomeView";
@@ -13,49 +13,15 @@ import AdminView from "./components/views/AdminView";
 import AdminLoginView from "./components/views/AdminLoginView";
 import LegislativeView from "./components/views/LegislativeView";
 import { initialAssemblyAttendance, initialAssemblyQuestions } from "./constants/data";
-
-const INITIAL_GRIEVANCES = [
-  {
-    id: "PET-2026-001",
-    name: "Suresh Kumar",
-    phone: "+91 94471 23456",
-    email: "suresh.k@gmail.com",
-    category: "Infrastructure",
-    subject: "Potholes on Payyambalam Road",
-    message: "The main approach road to Payyambalam Beach has developed dangerous potholes. Requesting urgent repair before the next heavy spell of rains.",
-    status: "In Progress",
-    date: "July 22, 2026, 09:15 AM",
-    timestamp: new Date("2026-07-22T09:15:00").getTime(),
-    isNew: false
-  },
-  {
-    id: "PET-2026-002",
-    name: "Anjali Devi",
-    phone: "+91 98952 98765",
-    email: "anjali.devi@yahoo.com",
-    category: "Water/Power Issue",
-    subject: "Water Supply Disruption in Ward 4",
-    message: "Drinking water supply has been disrupted in Ward 4 for the last 3 days. The water tanker is not arriving regularly.",
-    status: "Pending",
-    date: "July 24, 2026, 08:30 AM",
-    timestamp: new Date("2026-07-24T08:30:00").getTime(),
-    isNew: true
-  }
-];
-
-function getInitialGrievances() {
-  try {
-    const saved = sessionStorage.getItem("mla_grievances");
-    if (saved) return JSON.parse(saved);
-  } catch (_) {}
-  return INITIAL_GRIEVANCES;
-}
+import { api } from "./lib/api";
 
 function getInitialAttendance() {
   try {
     const saved = sessionStorage.getItem("mla_attendance");
     if (saved) return JSON.parse(saved);
-  } catch (_) {}
+  } catch {
+    // ignore malformed sessionStorage value
+  }
   return initialAssemblyAttendance;
 }
 
@@ -63,7 +29,9 @@ function getInitialQuestions() {
   try {
     const saved = sessionStorage.getItem("mla_questions");
     if (saved) return JSON.parse(saved);
-  } catch (_) {}
+  } catch {
+    // ignore malformed sessionStorage value
+  }
   return initialAssemblyQuestions;
 }
 
@@ -72,11 +40,18 @@ function App() {
     () => sessionStorage.getItem("mla_tab") || "/"
   );
 
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(
-    () => sessionStorage.getItem("mla_admin_auth") === "true"
+  const [adminToken, setAdminToken] = useState(
+    () => sessionStorage.getItem("mla_admin_token") || null
   );
+  const [citizenToken, setCitizenToken] = useState(
+    () => sessionStorage.getItem("mla_citizen_token") || null
+  );
+  const [citizenName, setCitizenName] = useState("");
 
-  const [grievances, setGrievances] = useState(getInitialGrievances);
+  const isAdminLoggedIn = !!adminToken;
+  const isCitizenLoggedIn = !!citizenToken;
+
+  const [grievances, setGrievances] = useState([]);
   const [attendance, setAttendance] = useState(getInitialAttendance);
   const [questions, setQuestions] = useState(getInitialQuestions);
 
@@ -84,10 +59,6 @@ function App() {
   useEffect(() => {
     sessionStorage.setItem("mla_tab", currentTab);
   }, [currentTab]);
-
-  useEffect(() => {
-    sessionStorage.setItem("mla_grievances", JSON.stringify(grievances));
-  }, [grievances]);
 
   useEffect(() => {
     sessionStorage.setItem("mla_attendance", JSON.stringify(attendance));
@@ -98,46 +69,45 @@ function App() {
   }, [questions]);
 
   useEffect(() => {
-    if (isAdminLoggedIn) {
-      sessionStorage.setItem("mla_admin_auth", "true");
-    } else {
-      sessionStorage.removeItem("mla_admin_auth");
+    if (adminToken) sessionStorage.setItem("mla_admin_token", adminToken);
+    else sessionStorage.removeItem("mla_admin_token");
+  }, [adminToken]);
+
+  useEffect(() => {
+    if (citizenToken) sessionStorage.setItem("mla_citizen_token", citizenToken);
+    else sessionStorage.removeItem("mla_citizen_token");
+  }, [citizenToken]);
+
+  const refreshGrievances = useCallback(async () => {
+    if (!adminToken) return;
+    try {
+      const data = await api.get("/api/grievances", adminToken);
+      setGrievances(data);
+    } catch {
+      setGrievances([]);
     }
-  }, [isAdminLoggedIn]);
+  }, [adminToken]);
+
+  // Fetches grievances from the backend whenever the admin token changes (login/logout).
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refreshGrievances();
+  }, [refreshGrievances]);
+
+  // Fetches the citizen's profile from the backend whenever their token changes (login/logout).
+  useEffect(() => {
+    if (!citizenToken) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCitizenName("");
+      return;
+    }
+    api.get("/api/users/me", citizenToken)
+      .then((user) => setCitizenName(user.full_name))
+      .catch(() => setCitizenName(""));
+  }, [citizenToken]);
 
   // --- Handlers ---
-  const addGrievance = (formData) => {
-    const petitionId = `PET-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
-    const now = new Date();
-    const dateStr = now.toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    });
-    const newEntry = {
-      id: petitionId,
-      name: formData.name,
-      phone: formData.phone,
-      email: formData.email,
-      category: formData.category,
-      subject: formData.subject,
-      message: formData.message,
-      date: dateStr,
-      timestamp: now.getTime(),
-      status: "Pending",
-      isNew: true
-    };
-    setGrievances((prev) => [newEntry, ...prev]);
-  };
-
-  const deleteGrievance = (id) => {
-    setGrievances(prev => prev.filter(g => g.id !== id));
-  };
-
   const handleAdminNavigation = (path) => {
-    // If trying to access admin explicitly but not logged in
     if (path === "/admin" && !isAdminLoggedIn) {
       setCurrentTab("/admin-login");
     } else {
@@ -145,14 +115,23 @@ function App() {
     }
   };
 
-  const handleLogin = () => {
-    setIsAdminLoggedIn(true);
+  const handleLogin = (token) => {
+    setAdminToken(token);
     setCurrentTab("/admin");
   };
 
   const handleLogout = () => {
-    setIsAdminLoggedIn(false);
+    setAdminToken(null);
+    setGrievances([]);
     setCurrentTab("/");
+  };
+
+  const handleCitizenLogin = (token) => {
+    setCitizenToken(token);
+  };
+
+  const handleCitizenLogout = () => {
+    setCitizenToken(null);
   };
 
   // Admin login full-screen (no header/footer)
@@ -168,17 +147,26 @@ function App() {
       case "/legislative":  return <LegislativeView attendance={attendance} questions={questions} isAdmin={isAdminLoggedIn} />;
       case "/development":  return <DevelopmentView isAdmin={isAdminLoggedIn} />;
       case "/news":         return <NewsView isAdmin={isAdminLoggedIn} />;
-      case "/gallery":      return <GalleryView isAdmin={isAdminLoggedIn} />;
+      case "/gallery":      return <GalleryView />;
       case "/schemes":      return <SchemesView isAdmin={isAdminLoggedIn} />;
       case "/contact":
-        return <ContactView addGrievance={addGrievance} />;
+        return (
+          <ContactView
+            isCitizenLoggedIn={isCitizenLoggedIn}
+            citizenToken={citizenToken}
+            citizenName={citizenName}
+            onCitizenLogin={handleCitizenLogin}
+            onCitizenLogout={handleCitizenLogout}
+          />
+        );
       case "/admin":
         return isAdminLoggedIn
-          ? <AdminView 
-              grievances={grievances} setGrievances={setGrievances} 
+          ? <AdminView
+              adminToken={adminToken}
+              grievances={grievances} refreshGrievances={refreshGrievances}
               attendance={attendance} setAttendance={setAttendance}
               questions={questions} setQuestions={setQuestions}
-              onLogout={handleLogout} onDelete={deleteGrievance} 
+              onLogout={handleLogout}
             />
           : <AdminLoginView onLoginSuccess={handleLogin} />;
       default:              return <HomeView setCurrentTab={handleAdminNavigation} isAdmin={isAdminLoggedIn} />;
@@ -191,7 +179,7 @@ function App() {
         <Header
           currentTab={currentTab}
           setCurrentTab={handleAdminNavigation}
-          newGrievancesCount={grievances.filter(g => g.isNew).length}
+          newGrievancesCount={grievances.filter(g => g.is_new).length}
           isAdmin={isAdminLoggedIn}
           onLogout={handleLogout}
         />
