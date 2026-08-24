@@ -27,17 +27,17 @@ const navigation = [
     path: routes.development,
   },
   {
-    id: 5,
+    id: 6,
     label: "News & Events",
     path: routes.news,
   },
   {
-    id: 6,
+    id: 7,
     label: "Gallery",
     path: routes.gallery,
   },
   {
-    id: 7,
+    id: 8,
     label: "Schemes",
     path: routes.schemes,
   },
