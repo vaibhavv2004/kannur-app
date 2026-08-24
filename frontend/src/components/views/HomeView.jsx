@@ -3,6 +3,7 @@ import { keyStats, newsArticles } from "../../constants/data";
 import { ArrowRight, ChevronRight, FileText, Settings, Award, Users } from "lucide-react";
 import siteConfig from "../../config/siteConfig";
 import EditableText from "../common/EditableText";
+import SectionTitle from "../common/SectionTitle";
 
 function HomeView({ setCurrentTab, isAdmin }) {
   // Local state for editable content
@@ -44,7 +45,7 @@ function HomeView({ setCurrentTab, isAdmin }) {
             <span className="inline-flex items-center space-x-2 rounded-full bg-emerald-500/10 px-3 py-1 text-sm font-semibold text-emerald-400 border border-emerald-500/20">
               <span>Democratic Representation</span>
             </span>
-            <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl bg-gradient-to-r from-white via-slate-100 to-emerald-200 bg-clip-text text-transparent pb-1">
+            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl bg-gradient-to-r from-white via-slate-100 to-emerald-200 bg-clip-text text-transparent pb-1">
               <EditableText
                 value={heroTitle}
                 onSave={setHeroTitle}
@@ -97,7 +98,7 @@ function HomeView({ setCurrentTab, isAdmin }) {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-emerald-100">
           {stats.map((stat, idx) => (
             <div key={idx} className="flex flex-col items-center text-center p-4">
-              <span className="text-4xl font-extrabold text-slate-800 bg-gradient-to-r from-emerald-600 to-teal-700 bg-clip-text text-transparent">
+              <span className="text-3xl font-extrabold text-slate-800 bg-gradient-to-r from-emerald-600 to-teal-700 bg-clip-text text-transparent">
                 <EditableText value={stat.value} onSave={(val) => updateStat(idx, "value", val)} isAdmin={isAdmin} />
               </span>
               <span className="text-sm font-bold text-slate-700 mt-1">
@@ -113,10 +114,7 @@ function HomeView({ setCurrentTab, isAdmin }) {
 
       {/* Quick Actions Grid */}
       <section className="space-y-6">
-        <div className="text-center space-y-2">
-          <h3 className="text-3xl font-bold text-slate-800">Quick Citizen Portal</h3>
-          <p className="text-slate-500 max-w-lg mx-auto">Access digital services and updates instantly. Click any card to redirect to the respective tab.</p>
-        </div>
+        <SectionTitle title="Quick Citizen Portal" subtitle="Access digital services and updates instantly. Click any card to redirect to the respective tab." />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {quickActions.map((action, idx) => {
             const Icon = action.icon;
@@ -147,7 +145,7 @@ function HomeView({ setCurrentTab, isAdmin }) {
       <section className="space-y-6">
         <div className="flex justify-between items-end border-b border-slate-100 pb-4">
           <div>
-            <h3 className="text-3xl font-bold text-slate-850">Recent Activities</h3>
+            <h3 className="text-2xl font-bold text-slate-850">Recent Activities</h3>
             <p className="text-slate-500 text-sm">Stay updated with latest decisions and events in the constituency.</p>
           </div>
           <button

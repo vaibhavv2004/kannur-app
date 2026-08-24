@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { welfareSchemes } from "../../constants/data";
 import { Search, ChevronDown, ChevronUp, Award, UserCheck, HelpCircle } from "lucide-react";
+import PageHeader from "../common/PageHeader";
 
 function SchemesView() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,11 +24,8 @@ function SchemesView() {
   return (
     <div className="space-y-8 py-8">
       {/* Page Header */}
-      <div className="border-b border-slate-100 pb-4 text-center sm:text-left flex flex-col md:flex-row justify-between items-center gap-4">
-        <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 sm:text-4xl">Welfare Schemes</h2>
-          <p className="text-slate-500 mt-1">Search government support schemes, check eligibility, and learn how to apply.</p>
-        </div>
+      <div className="border-b border-slate-100 pb-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <PageHeader bordered={false} title="Welfare Schemes" description="Search government support schemes, check eligibility, and learn how to apply." />
 
         {/* Search */}
         <div className="relative w-full md:w-80">

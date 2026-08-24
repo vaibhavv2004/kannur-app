@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { newsArticles, upcomingEvents } from "../../constants/data";
 import { Search, Calendar, Clock, MapPin, ChevronRight } from "lucide-react";
+import PageHeader from "../common/PageHeader";
 
 function NewsView() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,11 +19,8 @@ function NewsView() {
   return (
     <div className="space-y-8 py-8">
       {/* Page Header */}
-      <div className="border-b border-slate-100 pb-4 text-center sm:text-left flex flex-col md:flex-row justify-between items-center gap-4">
-        <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 sm:text-4xl">News & Events</h2>
-          <p className="text-slate-500 mt-1">Stay updated with press statements, field visits, and upcoming schedules.</p>
-        </div>
+      <div className="border-b border-slate-100 pb-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <PageHeader bordered={false} title="News & Events" description="Stay updated with press statements, field visits, and upcoming schedules." />
 
         {/* Search Bar */}
         <div className="relative w-full md:w-80">

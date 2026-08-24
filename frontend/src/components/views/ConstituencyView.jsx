@@ -1,5 +1,6 @@
 import { landmarks } from "../../constants/data";
 import { Info, Compass, Users, Map } from "lucide-react";
+import PageHeader from "../common/PageHeader";
 
 function ConstituencyView() {
   const quickFacts = [
@@ -11,10 +12,7 @@ function ConstituencyView() {
   return (
     <div className="space-y-12 py-8">
       {/* Page Header */}
-      <div className="border-b border-slate-100 pb-4 text-center sm:text-left">
-        <h2 className="text-3xl font-extrabold text-slate-800 sm:text-4xl">Our Constituency: Kannur</h2>
-        <p className="text-slate-500 mt-1">Explore the heritage, culture, and key facts of our historical assembly seat.</p>
-      </div>
+      <PageHeader title="Our Constituency: Kannur" description="Explore the heritage, culture, and key facts of our historical assembly seat." />
 
       {/* History and Demographics */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">

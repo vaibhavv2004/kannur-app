@@ -1,17 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { offices } from "../../constants/data";
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle, LogOut, UserCircle2 } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle, LogOut, UserCircle2, Inbox } from "lucide-react";
 import { api } from "../../lib/api";
+import { getStatusColor } from "../../lib/grievanceStatus";
 import CitizenLoginView from "./CitizenLoginView";
 import RegisterView from "./RegisterView";
+import PageHeader from "../common/PageHeader";
+
+function formatDate(iso) {
+  try {
+    return new Date(iso).toLocaleDateString("en-IN", {
+      day: "2-digit", month: "long", year: "numeric",
+    });
+  } catch {
+    return iso;
+  }
+}
 
 function ContactView({ isCitizenLoggedIn, citizenToken, citizenName, onCitizenLogin, onCitizenLogout }) {
   const [authView, setAuthView] = useState("login"); // "login" or "register"
+  const [viewMode, setViewMode] = useState("submit"); // "submit" or "history"
   const [submissionType, setSubmissionType] = useState("grievance"); // "grievance" or "question"
   const [formData, setFormData] = useState({ category: "Infrastructure", subject: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [myGrievances, setMyGrievances] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+
+  useEffect(() => {
+    if (viewMode !== "history" || !citizenToken) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setHistoryLoading(true);
+    api.get("/api/grievances/me", citizenToken)
+      .then(setMyGrievances)
+      .catch(() => setMyGrievances([]))
+      .finally(() => setHistoryLoading(false));
+  }, [viewMode, citizenToken]);
 
   const categories = ["Infrastructure", "Welfare Schemes", "Water/Power Issue", "Education", "Healthcare", "Other"];
 
@@ -44,11 +70,7 @@ function ContactView({ isCitizenLoggedIn, citizenToken, citizenName, onCitizenLo
 
   return (
     <div className="space-y-12 py-8">
-      {/* Page Header */}
-      <div className="border-b border-slate-100 pb-4 text-center sm:text-left">
-        <h2 className="text-3xl font-extrabold text-slate-800 sm:text-4xl">Contact & Public Grievances</h2>
-        <p className="text-slate-500 mt-1">Submit your petitions, query requests, or schedule a meeting at the camp offices.</p>
-      </div>
+      <PageHeader title="Contact & Public Grievances" description="Submit your petitions, query requests, or schedule a meeting at the camp offices." />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Submission Form */}
@@ -61,6 +83,64 @@ function ContactView({ isCitizenLoggedIn, citizenToken, citizenName, onCitizenLo
             )
           ) : (
             <>
+              <div className="flex items-center justify-between bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 text-xs text-slate-600">
+                <span className="flex items-center gap-1.5">
+                  <UserCircle2 className="h-4 w-4 text-emerald-600" />
+                  Logged in as <strong>{citizenName}</strong>
+                </span>
+                <button onClick={onCitizenLogout} className="flex items-center gap-1 text-slate-500 hover:text-red-600 cursor-pointer">
+                  <LogOut className="h-3.5 w-3.5" /> Log out
+                </button>
+              </div>
+
+              <div className="flex bg-slate-100 p-1 rounded-lg w-fit">
+                <button
+                  type="button"
+                  onClick={() => setViewMode("submit")}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition cursor-pointer ${
+                    viewMode === "submit" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  Submit New
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode("history")}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition cursor-pointer ${
+                    viewMode === "history" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  My Submissions
+                </button>
+              </div>
+
+              {viewMode === "history" ? (
+                <div className="space-y-3">
+                  {historyLoading ? (
+                    <p className="text-xs text-slate-400 text-center py-8">Loading...</p>
+                  ) : myGrievances.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-slate-400 space-y-2">
+                      <Inbox className="h-8 w-8 opacity-40" />
+                      <p className="text-xs font-medium">You haven't submitted anything yet.</p>
+                    </div>
+                  ) : (
+                    myGrievances.map((g) => (
+                      <div key={g.id} className="border border-slate-100 rounded-xl p-4 space-y-1.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs font-bold text-slate-400">{g.petition_id}</span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${getStatusColor(g.status)}`}>
+                            {g.status}
+                          </span>
+                        </div>
+                        <h4 className="font-bold text-slate-800 text-sm">{g.subject}</h4>
+                        <p className="text-xs text-slate-500 line-clamp-2">{g.message}</p>
+                        <p className="text-[10px] font-semibold text-slate-400">{g.category} · {formatDate(g.created_at)}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              ) : (
+              <>
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <h3 className="text-xl font-bold text-slate-850">
                   {submissionType === "grievance" ? "Public Grievance Portal" : "Suggest Assembly Question"}
@@ -86,16 +166,6 @@ function ContactView({ isCitizenLoggedIn, citizenToken, citizenName, onCitizenLo
                     Assembly Question
                   </button>
                 </div>
-              </div>
-
-              <div className="flex items-center justify-between bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 text-xs text-slate-600">
-                <span className="flex items-center gap-1.5">
-                  <UserCircle2 className="h-4 w-4 text-emerald-600" />
-                  Logged in as <strong>{citizenName}</strong>
-                </span>
-                <button onClick={onCitizenLogout} className="flex items-center gap-1 text-slate-500 hover:text-red-600 cursor-pointer">
-                  <LogOut className="h-3.5 w-3.5" /> Log out
-                </button>
               </div>
 
               {submitted ? (
@@ -134,6 +204,8 @@ function ContactView({ isCitizenLoggedIn, citizenToken, citizenName, onCitizenLo
                     <span>{isSubmitting ? "Submitting..." : submissionType === "grievance" ? "Submit Grievance" : "Submit Question Suggestion"}</span>
                   </button>
                 </form>
+              )}
+              </>
               )}
             </>
           )}

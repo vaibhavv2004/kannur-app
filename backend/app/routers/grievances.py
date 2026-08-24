@@ -58,6 +58,17 @@ def submit_grievance(
     return _to_out(grievance)
 
 
+@router.get("/me", response_model=list[GrievanceOut])
+def list_my_grievances(
+    db: Session = Depends(get_db),
+    citizen: User = Depends(get_current_citizen),
+):
+    grievances = db.scalars(
+        select(Grievance).where(Grievance.user_id == citizen.id).order_by(Grievance.created_at.desc())
+    ).all()
+    return [_to_out(g) for g in grievances]
+
+
 @router.get("", response_model=list[GrievanceOut])
 def list_grievances(
     db: Session = Depends(get_db),

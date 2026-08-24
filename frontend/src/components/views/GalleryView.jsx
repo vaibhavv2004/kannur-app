@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { X, ZoomIn, PlayCircle } from "lucide-react";
 import { api } from "../../lib/api";
+import PageHeader from "../common/PageHeader";
 
 function extractYouTubeId(url) {
   const match = url.match(/(?:youtu\.be\/|v=|\/embed\/)([a-zA-Z0-9_-]{11})/);
@@ -25,10 +26,7 @@ function GalleryView() {
   return (
     <div className="space-y-8 py-8">
       {/* Page Header */}
-      <div className="border-b border-slate-100 pb-4 text-center sm:text-left">
-        <h2 className="text-3xl font-extrabold text-slate-800 sm:text-4xl">Media Gallery</h2>
-        <p className="text-slate-500 mt-1">Glimpses of development projects, citizen interactions, and events in Kannur.</p>
-      </div>
+      <PageHeader title="Media Gallery" description="Glimpses of development projects, citizen interactions, and events in Kannur." />
 
       {/* Category Tabs */}
       <div className="flex flex-wrap gap-2 justify-center sm:justify-start">

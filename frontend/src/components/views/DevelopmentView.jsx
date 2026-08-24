@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { developmentProjects } from "../../constants/data";
 import { CircleCheck, Clock, ShieldAlert } from "lucide-react";
 import EditableText from "../common/EditableText";
+import PageHeader from "../common/PageHeader";
 
 function DevelopmentView({ isAdmin }) {
   const [filter, setFilter] = useState("All");
@@ -48,11 +49,8 @@ function DevelopmentView({ isAdmin }) {
   return (
     <div className="space-y-8 py-8">
       {/* Page Header */}
-      <div className="border-b border-slate-100 pb-4 text-center sm:text-left flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 sm:text-4xl">Development Projects</h2>
-          <p className="text-slate-500 mt-1">Track infrastructure works and community progress across the constituency.</p>
-        </div>
+      <div className="border-b border-slate-100 pb-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <PageHeader bordered={false} title="Development Projects" description="Track infrastructure works and community progress across the constituency." />
         <div className="flex h-10 items-center justify-center rounded-lg bg-emerald-500/10 px-4 text-sm font-semibold text-emerald-700">
           <span>Active Funds Allocated: ₹94.5 Cr</span>
         </div>

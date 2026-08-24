@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
 import HomeView from "./components/views/HomeView";
@@ -36,9 +37,9 @@ function getInitialQuestions() {
 }
 
 function App() {
-  const [currentTab, setCurrentTab] = useState(
-    () => sessionStorage.getItem("mla_tab") || "/"
-  );
+  const location = useLocation();
+  const navigate = useNavigate();
+  const currentTab = location.pathname;
 
   const [adminToken, setAdminToken] = useState(
     () => sessionStorage.getItem("mla_admin_token") || null
@@ -56,10 +57,6 @@ function App() {
   const [questions, setQuestions] = useState(getInitialQuestions);
 
   // --- Sync side effects OUTSIDE state updaters (React Strict Mode safe) ---
-  useEffect(() => {
-    sessionStorage.setItem("mla_tab", currentTab);
-  }, [currentTab]);
-
   useEffect(() => {
     sessionStorage.setItem("mla_attendance", JSON.stringify(attendance));
   }, [attendance]);
@@ -109,21 +106,21 @@ function App() {
   // --- Handlers ---
   const handleAdminNavigation = (path) => {
     if (path === "/admin" && !isAdminLoggedIn) {
-      setCurrentTab("/admin-login");
+      navigate("/admin-login");
     } else {
-      setCurrentTab(path);
+      navigate(path);
     }
   };
 
   const handleLogin = (token) => {
     setAdminToken(token);
-    setCurrentTab("/admin");
+    navigate("/admin");
   };
 
   const handleLogout = () => {
     setAdminToken(null);
     setGrievances([]);
-    setCurrentTab("/");
+    navigate("/");
   };
 
   const handleCitizenLogin = (token) => {
@@ -139,40 +136,6 @@ function App() {
     return <AdminLoginView onLoginSuccess={handleLogin} />;
   }
 
-  const renderView = () => {
-    switch (currentTab) {
-      case "/":             return <HomeView setCurrentTab={handleAdminNavigation} isAdmin={isAdminLoggedIn} />;
-      case "/about":        return <AboutView isAdmin={isAdminLoggedIn} />;
-      case "/constituency": return <ConstituencyView isAdmin={isAdminLoggedIn} />;
-      case "/legislative":  return <LegislativeView attendance={attendance} questions={questions} isAdmin={isAdminLoggedIn} />;
-      case "/development":  return <DevelopmentView isAdmin={isAdminLoggedIn} />;
-      case "/news":         return <NewsView isAdmin={isAdminLoggedIn} />;
-      case "/gallery":      return <GalleryView />;
-      case "/schemes":      return <SchemesView isAdmin={isAdminLoggedIn} />;
-      case "/contact":
-        return (
-          <ContactView
-            isCitizenLoggedIn={isCitizenLoggedIn}
-            citizenToken={citizenToken}
-            citizenName={citizenName}
-            onCitizenLogin={handleCitizenLogin}
-            onCitizenLogout={handleCitizenLogout}
-          />
-        );
-      case "/admin":
-        return isAdminLoggedIn
-          ? <AdminView
-              adminToken={adminToken}
-              grievances={grievances} refreshGrievances={refreshGrievances}
-              attendance={attendance} setAttendance={setAttendance}
-              questions={questions} setQuestions={setQuestions}
-              onLogout={handleLogout}
-            />
-          : <AdminLoginView onLoginSuccess={handleLogin} />;
-      default:              return <HomeView setCurrentTab={handleAdminNavigation} isAdmin={isAdminLoggedIn} />;
-    }
-  };
-
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
       <div>
@@ -182,9 +145,48 @@ function App() {
           newGrievancesCount={grievances.filter(g => g.is_new).length}
           isAdmin={isAdminLoggedIn}
           onLogout={handleLogout}
+          isCitizenLoggedIn={isCitizenLoggedIn}
+          citizenName={citizenName}
+          onCitizenLogout={handleCitizenLogout}
         />
         <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-          {renderView()}
+          <Routes>
+            <Route path="/" element={<HomeView setCurrentTab={handleAdminNavigation} isAdmin={isAdminLoggedIn} />} />
+            <Route path="/about" element={<AboutView isAdmin={isAdminLoggedIn} />} />
+            <Route path="/constituency" element={<ConstituencyView isAdmin={isAdminLoggedIn} />} />
+            <Route path="/legislative" element={<LegislativeView attendance={attendance} questions={questions} isAdmin={isAdminLoggedIn} />} />
+            <Route path="/development" element={<DevelopmentView isAdmin={isAdminLoggedIn} />} />
+            <Route path="/news" element={<NewsView isAdmin={isAdminLoggedIn} />} />
+            <Route path="/gallery" element={<GalleryView />} />
+            <Route path="/schemes" element={<SchemesView isAdmin={isAdminLoggedIn} />} />
+            <Route
+              path="/contact"
+              element={
+                <ContactView
+                  isCitizenLoggedIn={isCitizenLoggedIn}
+                  citizenToken={citizenToken}
+                  citizenName={citizenName}
+                  onCitizenLogin={handleCitizenLogin}
+                  onCitizenLogout={handleCitizenLogout}
+                />
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                isAdminLoggedIn
+                  ? <AdminView
+                      adminToken={adminToken}
+                      grievances={grievances} refreshGrievances={refreshGrievances}
+                      attendance={attendance} setAttendance={setAttendance}
+                      questions={questions} setQuestions={setQuestions}
+                      onLogout={handleLogout}
+                    />
+                  : <AdminLoginView onLoginSuccess={handleLogin} />
+              }
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </main>
       </div>
       <Footer setCurrentTab={handleAdminNavigation} currentTab={currentTab} />

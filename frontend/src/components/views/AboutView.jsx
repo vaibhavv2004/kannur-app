@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { mlaProfile } from "../../constants/data";
 import { Award, BookOpen, Heart, Calendar } from "lucide-react";
 import EditableText from "../common/EditableText";
+import PageHeader from "../common/PageHeader";
 
 function AboutView({ isAdmin }) {
   const [profile, setProfile] = useState(() => {
@@ -20,10 +21,7 @@ function AboutView({ isAdmin }) {
   return (
     <div className="space-y-12 py-8">
       {/* Page Header */}
-      <div className="border-b border-slate-100 pb-4 text-center sm:text-left">
-        <h2 className="text-3xl font-extrabold text-slate-800 sm:text-4xl">Biography & Vision</h2>
-        <p className="text-slate-500 mt-1">Get to know your representative, their background, and vision for the future.</p>
-      </div>
+      <PageHeader title="Biography & Vision" description="Get to know your representative, their background, and vision for the future." />
 
       {/* Main Biography Block */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">

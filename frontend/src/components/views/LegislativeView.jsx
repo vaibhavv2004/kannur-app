@@ -1,4 +1,5 @@
 import { Award, BookOpen, Search, HelpCircle } from "lucide-react";
+import PageHeader from "../common/PageHeader";
 
 function LegislativeView({ attendance, questions }) {
   const attendancePercentage = attendance.totalSessions > 0
@@ -8,10 +9,7 @@ function LegislativeView({ attendance, questions }) {
   return (
     <div className="space-y-12 py-8 animate-in fade-in duration-300">
       {/* Page Header */}
-      <div className="border-b border-slate-100 pb-4 text-center sm:text-left">
-        <h2 className="text-3xl font-extrabold text-slate-800 sm:text-4xl">Legislative Assembly Performance</h2>
-        <p className="text-slate-500 mt-1">Tracking the MLA's attendance, active participation, and key questions raised in the State Assembly.</p>
-      </div>
+      <PageHeader title="Legislative Assembly Performance" description="Tracking the MLA's attendance, active participation, and key questions raised in the State Assembly." />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         

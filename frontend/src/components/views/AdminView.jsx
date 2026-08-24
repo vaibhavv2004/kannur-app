@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Shield, Bell, CheckCircle, Clock, AlertCircle, LogOut, Inbox, Trash2, Edit3, Plus, Save, UserCheck, UserX, Eye, Images, X } from "lucide-react";
 import { api } from "../../lib/api";
+import { getStatusColor } from "../../lib/grievanceStatus";
 
 const ID_PROOF_LABELS = {
   aadhaar: "Aadhaar Card",
@@ -68,14 +69,6 @@ function AdminView({ adminToken, grievances, refreshGrievances, attendance, setA
   const handleSelect = (g) => {
     setSelectedId(g.id);
     markAsRead(g);
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Resolved":   return "bg-emerald-50 text-emerald-700 border-emerald-100";
-      case "In Progress":return "bg-blue-50 text-blue-700 border-blue-100";
-      default:           return "bg-amber-50 text-amber-700 border-amber-100";
-    }
   };
 
   const total    = grievances.length;
@@ -163,7 +156,7 @@ function AdminView({ adminToken, grievances, refreshGrievances, attendance, setA
             <Shield className="h-6 w-6" />
           </div>
           <div>
-            <h2 className="text-3xl font-extrabold text-slate-800 sm:text-4xl">Admin Portal</h2>
+            <h2 className="text-2xl font-bold text-slate-800 sm:text-3xl">Admin Portal</h2>
             <p className="text-slate-500 mt-0.5 text-sm">Constituency Grievance Monitoring Dashboard</p>
           </div>
         </div>
@@ -230,7 +223,7 @@ function AdminView({ adminToken, grievances, refreshGrievances, attendance, setA
                 <div key={idx} className={`border rounded-2xl p-5 flex items-center justify-between bg-white shadow-xs ${stat.color}`}>
                   <div>
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">{stat.label}</span>
-                    <span className="text-3xl font-extrabold mt-1 block">{stat.val}</span>
+                    <span className="text-2xl font-extrabold mt-1 block">{stat.val}</span>
                   </div>
                   <div className="p-3 rounded-xl bg-white/70 border border-current/10">
                     <Icon className="h-5 w-5" />

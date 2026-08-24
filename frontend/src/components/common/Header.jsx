@@ -1,30 +1,57 @@
-import { useState } from "react";
-import { Menu, X, Landmark, PhoneCall, Bell, LogOut } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Menu, X, Landmark, PhoneCall, ChevronDown, User, LogOut, LayoutDashboard, FileText } from "lucide-react";
 import navigation from "../../constants/navigation";
 import siteConfig from "../../config/siteConfig";
 
-function Header({ currentTab, setCurrentTab, newGrievancesCount = 0, isAdmin, onLogout }) {
+const PRIMARY_COUNT = 4;
+
+function Header({ currentTab, setCurrentTab, newGrievancesCount = 0, isAdmin, onLogout, isCitizenLoggedIn, citizenName, onCitizenLogout }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const moreRef = useRef(null);
+  const accountRef = useRef(null);
+
+  const primaryNav = navigation.slice(0, PRIMARY_COUNT);
+  const moreNav = navigation.slice(PRIMARY_COUNT);
+  const isMoreActive = moreNav.some((item) => item.path === currentTab);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (moreRef.current && !moreRef.current.contains(e.target)) setIsMoreOpen(false);
+      if (accountRef.current && !accountRef.current.contains(e.target)) setIsAccountOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleNavClick = (route) => {
     setCurrentTab(route);
     setIsOpen(false);
+    setIsMoreOpen(false);
+    setIsAccountOpen(false);
+  };
+
+  const handleAccountLogout = () => {
+    if (isAdmin) onLogout();
+    else onCitizenLogout?.();
+    setIsAccountOpen(false);
   };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-emerald-100 bg-white/90 backdrop-blur-md shadow-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-20 items-center justify-between">
+        <div className="flex h-16 items-center justify-between">
           {/* Logo Section */}
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => handleNavClick("/")}>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-md shadow-emerald-200">
-              <Landmark className="h-6 w-6" />
+          <div className="flex items-center space-x-2.5 cursor-pointer" onClick={() => handleNavClick("/")}>
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-md shadow-emerald-200">
+              <Landmark className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-slate-800 tracking-tight leading-tight">
+              <h1 className="text-base font-bold text-slate-800 tracking-tight leading-tight">
                 {siteConfig.mlaName}
               </h1>
-              <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">
+              <p className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider">
                 MLA • {siteConfig.constituency} Constituency
               </p>
             </div>
@@ -32,88 +59,136 @@ function Header({ currentTab, setCurrentTab, newGrievancesCount = 0, isAdmin, on
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-1">
-            {navigation.map((item) => (
+            {primaryNav.map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.path)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
                   currentTab === item.path
-                    ? "bg-emerald-50 text-emerald-700 font-semibold shadow-xs"
+                    ? "bg-emerald-50 text-emerald-700 font-semibold"
                     : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                 }`}
               >
                 {item.label}
               </button>
             ))}
+
+            {/* More dropdown */}
+            <div className="relative" ref={moreRef}>
+              <button
+                onClick={() => setIsMoreOpen((v) => !v)}
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
+                  isMoreActive ? "bg-emerald-50 text-emerald-700 font-semibold" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                }`}
+              >
+                <span>More</span>
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isMoreOpen ? "rotate-180" : ""}`} />
+              </button>
+              {isMoreOpen && (
+                <div className="absolute right-0 mt-2 w-48 rounded-xl border border-slate-100 bg-white shadow-lg py-1.5 animate-in fade-in slide-in-from-top-1 duration-150">
+                  {moreNav.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => handleNavClick(item.path)}
+                      className={`block w-full text-left px-4 py-2 text-sm cursor-pointer transition ${
+                        currentTab === item.path ? "text-emerald-700 font-semibold bg-emerald-50" : "text-slate-600 hover:bg-slate-50"
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* Right Actions */}
-          <div className="hidden lg:flex items-center gap-3">
-            {isAdmin && (
+          <div className="hidden lg:flex items-center gap-2">
+            {/* Account menu */}
+            <div className="relative" ref={accountRef}>
               <button
-                onClick={onLogout}
-                className="flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-white border border-slate-700 hover:bg-slate-900 transition cursor-pointer shadow-md shadow-slate-300"
+                onClick={() => setIsAccountOpen((v) => !v)}
+                className="relative flex items-center gap-1.5 pl-2 pr-2.5 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition cursor-pointer"
               >
-                <LogOut className="h-4 w-4" />
-                <span>Log Out</span>
-              </button>
-            )}
-
-            {/* Notification Bell (Only visible on Admin Page) */}
-            {currentTab === "/admin" && (
-              <button
-                onClick={() => handleNavClick("/admin")}
-                className="relative flex items-center justify-center h-10 w-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-all duration-200 cursor-pointer"
-                title="Admin Grievance Notifications"
-              >
-                <Bell className={`h-5 w-5 ${newGrievancesCount > 0 ? "animate-[wiggle_0.8s_ease-in-out_infinite]" : ""}`} />
-                {newGrievancesCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-extrabold shadow-md shadow-red-300 animate-in zoom-in duration-200">
-                    {newGrievancesCount > 99 ? "99+" : newGrievancesCount}
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-600">
+                  <User className="h-3.5 w-3.5" />
+                </span>
+                <span className="max-w-[8rem] truncate">
+                  {isAdmin ? "Admin" : isCitizenLoggedIn ? citizenName : "Account"}
+                </span>
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isAccountOpen ? "rotate-180" : ""}`} />
+                {isAdmin && newGrievancesCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white text-[9px] font-extrabold">
+                    {newGrievancesCount > 9 ? "9+" : newGrievancesCount}
                   </span>
                 )}
               </button>
-            )}
+              {isAccountOpen && (
+                <div className="absolute right-0 mt-2 w-52 rounded-xl border border-slate-100 bg-white shadow-lg py-1.5 animate-in fade-in slide-in-from-top-1 duration-150">
+                  {isAdmin ? (
+                    <>
+                      <button
+                        onClick={() => handleNavClick("/admin")}
+                        className="flex w-full items-center justify-between px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 cursor-pointer"
+                      >
+                        <span className="flex items-center gap-2"><LayoutDashboard className="h-4 w-4" /> Dashboard</span>
+                        {newGrievancesCount > 0 && (
+                          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-extrabold px-1">
+                            {newGrievancesCount}
+                          </span>
+                        )}
+                      </button>
+                      <button
+                        onClick={handleAccountLogout}
+                        className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer"
+                      >
+                        <LogOut className="h-4 w-4" /> Log Out
+                      </button>
+                    </>
+                  ) : isCitizenLoggedIn ? (
+                    <>
+                      <button
+                        onClick={() => handleNavClick("/contact")}
+                        className="flex w-full items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 cursor-pointer"
+                      >
+                        <FileText className="h-4 w-4" /> My Grievances
+                      </button>
+                      <button
+                        onClick={handleAccountLogout}
+                        className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer"
+                      >
+                        <LogOut className="h-4 w-4" /> Log Out
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => handleNavClick("/contact")}
+                      className="flex w-full items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 cursor-pointer"
+                    >
+                      <User className="h-4 w-4" /> Citizen / Admin Login
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Contact Button */}
             <button
               onClick={() => handleNavClick("/contact")}
-              className="flex items-center space-x-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white shadow-md shadow-emerald-200 hover:bg-emerald-700 hover:shadow-lg transition-all duration-200 cursor-pointer"
+              className="flex items-center space-x-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-md shadow-emerald-200 hover:bg-emerald-700 hover:shadow-lg transition-all duration-200 cursor-pointer"
             >
               <PhoneCall className="h-4 w-4" />
               <span>Contact Office</span>
             </button>
           </div>
 
-          {/* Mobile Right Side: Bell + Hamburger */}
+          {/* Mobile Right Side */}
           <div className="flex lg:hidden items-center gap-2">
-            {isAdmin && (
-              <button
-                onClick={onLogout}
-                className="flex items-center justify-center h-10 w-10 rounded-xl bg-slate-800 text-white transition cursor-pointer"
-                title="Log Out"
-              >
-                <LogOut className="h-4 w-4" />
-              </button>
+            {isAdmin && newGrievancesCount > 0 && (
+              <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-extrabold px-1">
+                {newGrievancesCount}
+              </span>
             )}
-
-            {/* Mobile Notification Bell (Only visible on Admin Page) */}
-            {currentTab === "/admin" && (
-              <button
-                onClick={() => handleNavClick("/admin")}
-                className="relative flex items-center justify-center h-10 w-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition cursor-pointer"
-                title="Admin Notifications"
-              >
-                <Bell className="h-5 w-5" />
-                {newGrievancesCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-extrabold shadow-md shadow-red-300">
-                    {newGrievancesCount > 99 ? "99+" : newGrievancesCount}
-                  </span>
-                )}
-              </button>
-            )}
-
-            {/* Hamburger */}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center justify-center rounded-lg p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:outline-none"
@@ -142,6 +217,46 @@ function Header({ currentTab, setCurrentTab, newGrievancesCount = 0, isAdmin, on
                 {item.label}
               </button>
             ))}
+
+            <div className="pt-3 mt-2 border-t border-slate-100 space-y-1">
+              {isAdmin ? (
+                <>
+                  <button
+                    onClick={() => handleNavClick("/admin")}
+                    className="flex w-full items-center justify-between px-4 py-3 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  >
+                    <span>Admin Dashboard</span>
+                    {newGrievancesCount > 0 && (
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-extrabold px-1">
+                        {newGrievancesCount}
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    onClick={handleAccountLogout}
+                    className="flex w-full items-center gap-2 px-4 py-3 rounded-lg text-base font-medium text-red-600 hover:bg-red-50 cursor-pointer"
+                  >
+                    <LogOut className="h-4 w-4" /> Log Out
+                  </button>
+                </>
+              ) : isCitizenLoggedIn ? (
+                <>
+                  <button
+                    onClick={() => handleNavClick("/contact")}
+                    className="flex w-full items-center gap-2 px-4 py-3 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  >
+                    <FileText className="h-4 w-4" /> My Grievances ({citizenName})
+                  </button>
+                  <button
+                    onClick={handleAccountLogout}
+                    className="flex w-full items-center gap-2 px-4 py-3 rounded-lg text-base font-medium text-red-600 hover:bg-red-50 cursor-pointer"
+                  >
+                    <LogOut className="h-4 w-4" /> Log Out
+                  </button>
+                </>
+              ) : null}
+            </div>
+
             <div className="pt-4 border-t border-slate-100 mt-2">
               <button
                 onClick={() => handleNavClick("/contact")}
