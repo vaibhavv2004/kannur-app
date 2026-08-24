@@ -137,7 +137,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
+    <div className="min-h-screen bg-mesh-pattern flex flex-col justify-between">
       <div>
         <Header
           currentTab={currentTab}

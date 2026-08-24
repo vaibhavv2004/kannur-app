@@ -5,7 +5,21 @@ import siteConfig from "../../config/siteConfig";
 import EditableText from "../common/EditableText";
 import SectionTitle from "../common/SectionTitle";
 
+const HERO_BACKGROUNDS = [
+  { src: "/st.angelos_fort.jpg", alt: "St. Angelo Fort, Kannur" },
+  { src: "https://images.unsplash.com/photo-1548463870-9a3a21e604e4?auto=format&fit=crop&w=1600&q=80", alt: "Payyambalam Beach, Kannur" },
+];
+
 function HomeView({ setCurrentTab, isAdmin }) {
+  const [bgIndex, setBgIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setBgIndex((i) => (i + 1) % HERO_BACKGROUNDS.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
   // Local state for editable content
   const [heroTitle, setHeroTitle] = useState(() => sessionStorage.getItem("cms_home_title") || "Dedicated to the Growth of Kannur");
   const [heroSubtitle, setHeroSubtitle] = useState(() => sessionStorage.getItem("cms_home_subtitle") || `Welcome to the official web portal of ${siteConfig.mlaName}. Together, let's build a smarter, healthier, and more prosperous constituency.`);
@@ -36,11 +50,21 @@ function HomeView({ setCurrentTab, isAdmin }) {
     <div className="space-y-16 py-8">
       {/* Hero Section */}
       <section className="relative overflow-hidden rounded-3xl bg-slate-900 text-white shadow-2xl">
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-transparent z-1"></div>
+        {HERO_BACKGROUNDS.map((bg, idx) => (
+          <img
+            key={bg.src}
+            src={bg.src}
+            alt={bg.alt}
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
+              idx === bgIndex ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        ))}
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/85 to-slate-900/30 z-1"></div>
         <div className="absolute -right-20 -top-20 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl"></div>
         <div className="absolute right-10 bottom-10 h-72 w-72 rounded-full bg-teal-500/10 blur-3xl"></div>
         
-        <div className="relative z-10 mx-auto max-w-7xl px-8 py-16 sm:py-24 lg:grid lg:grid-cols-2 lg:gap-8 items-center">
+        <div className="relative z-10 mx-auto max-w-7xl px-8 py-12 sm:py-14 lg:py-16 lg:grid lg:grid-cols-2 lg:gap-8 items-center">
           <div className="space-y-6">
             <span className="inline-flex items-center space-x-2 rounded-full bg-emerald-500/10 px-3 py-1 text-sm font-semibold text-emerald-400 border border-emerald-500/20">
               <span>Democratic Representation</span>
@@ -80,13 +104,13 @@ function HomeView({ setCurrentTab, isAdmin }) {
           </div>
           
           {/* Hero Image Side */}
-          <div className="mt-12 lg:mt-0 flex justify-center">
+          <div className="mt-10 lg:mt-0 flex justify-center lg:justify-end">
             <div className="relative group">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-500 opacity-20 blur-xl group-hover:opacity-30 transition"></div>
               <img
                 src="mla.jpg"
                 alt={siteConfig.mlaName}
-                className="relative z-10 w-80 h-96 object-cover rounded-2xl border-4 border-slate-800 shadow-2xl"
+                className="relative z-10 w-64 h-72 sm:w-72 sm:h-80 object-cover rounded-2xl border-4 border-slate-800 shadow-2xl"
               />
             </div>
           </div>

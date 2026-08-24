@@ -26,12 +26,12 @@ export const landmarks = [
   {
     name: "St. Angelo Fort",
     desc: "A massive triangular stone fort built by the Portuguese in 1505, situated on the coast of the Arabian Sea.",
-    image: "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?auto=format&fit=crop&w=600&q=80"
+    image: "/st.angelos_fort.jpg"
   },
   {
     name: "Payyambalam Beach",
     desc: "A long, beautiful stretch of golden sand, known for its scenic views, peaceful atmosphere, and surf.",
-    image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80"
+    image: "https://images.unsplash.com/photo-1548463870-9a3a21e604e4?auto=format&fit=crop&w=600&q=80"
   },
   {
     name: "Muzhappilangad Drive-in Beach",
