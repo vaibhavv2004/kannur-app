@@ -1,16 +1,23 @@
-import { useState } from "react";
-import { welfareSchemes } from "../../constants/data";
+import { useState, useEffect } from "react";
 import { Search, ChevronDown, ChevronUp, Award, UserCheck, HelpCircle } from "lucide-react";
 import PageHeader from "../common/PageHeader";
+import { api } from "../../lib/api";
 
 function SchemesView() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [expandedId, setExpandedId] = useState(null);
+  const [content, setContent] = useState(null);
+
+  useEffect(() => {
+    api.get("/api/content/schemes").then((res) => setContent(res.data)).catch(() => setContent(null));
+  }, []);
 
   const categories = ["All", "Healthcare", "Education", "Employment", "Agriculture"];
 
-  const filteredSchemes = welfareSchemes.filter((scheme) => {
+  if (!content) return null;
+
+  const filteredSchemes = content.schemes.filter((scheme) => {
     const matchesSearch = scheme.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       scheme.benefits.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = activeCategory === "All" || scheme.category === activeCategory;

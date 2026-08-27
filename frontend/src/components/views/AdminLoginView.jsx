@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Shield, Eye, EyeOff, Lock, User, AlertCircle } from "lucide-react";
-import siteConfig from "../../config/siteConfig";
 import { api } from "../../lib/api";
 
-function AdminLoginView({ onLoginSuccess }) {
+function AdminLoginView({ onLoginSuccess, siteSettings }) {
   const [form, setForm] = useState({ username: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -47,7 +46,7 @@ function AdminLoginView({ onLoginSuccess }) {
             </div>
             <div>
               <h1 className="text-2xl font-extrabold text-white">Admin Portal</h1>
-              <p className="text-sm text-slate-400 mt-1">{siteConfig.constituency} Constituency — Staff Access</p>
+              <p className="text-sm text-slate-400 mt-1">{siteSettings?.constituency} Constituency — Staff Access</p>
             </div>
           </div>
 

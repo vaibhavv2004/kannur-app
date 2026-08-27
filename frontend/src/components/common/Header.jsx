@@ -1,11 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { Menu, X, Landmark, PhoneCall, ChevronDown, User, LogOut, LayoutDashboard, FileText } from "lucide-react";
 import navigation from "../../constants/navigation";
-import siteConfig from "../../config/siteConfig";
 
 const PRIMARY_COUNT = 4;
 
-function Header({ currentTab, setCurrentTab, newGrievancesCount = 0, isAdmin, onLogout, isCitizenLoggedIn, citizenName, onCitizenLogout }) {
+function Header({ currentTab, setCurrentTab, newGrievancesCount = 0, isAdmin, onLogout, isCitizenLoggedIn, citizenName, onCitizenLogout, siteSettings }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
@@ -49,10 +48,10 @@ function Header({ currentTab, setCurrentTab, newGrievancesCount = 0, isAdmin, on
             </div>
             <div>
               <h1 className="text-base font-bold text-slate-800 tracking-tight leading-tight">
-                {siteConfig.mlaName}
+                {siteSettings?.mlaName}
               </h1>
               <p className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider">
-                MLA • {siteConfig.constituency} Constituency
+                MLA • {siteSettings?.constituency} Constituency
               </p>
             </div>
           </div>

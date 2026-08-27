@@ -5,7 +5,7 @@ from slowapi.errors import RateLimitExceeded
 
 from app.config import settings
 from app.limiter import limiter
-from app.routers import auth, gallery, grievances, users
+from app.routers import auth, content, gallery, grievances, users
 
 app = FastAPI(title="Kannur MLA Portal API")
 
@@ -24,6 +24,7 @@ app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(grievances.router)
 app.include_router(gallery.router)
+app.include_router(content.router)
 
 
 @app.get("/health")

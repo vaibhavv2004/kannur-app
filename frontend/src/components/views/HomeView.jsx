@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
-import { keyStats, newsArticles } from "../../constants/data";
 import { ArrowRight, ChevronRight, FileText, Settings, Award, Users } from "lucide-react";
-import siteConfig from "../../config/siteConfig";
-import EditableText from "../common/EditableText";
 import SectionTitle from "../common/SectionTitle";
+import { api } from "../../lib/api";
 
 const HERO_BACKGROUNDS = [
   { src: "/st.angelos_fort.jpg", alt: "St. Angelo Fort, Kannur" },
   { src: "https://images.unsplash.com/photo-1548463870-9a3a21e604e4?auto=format&fit=crop&w=1600&q=80", alt: "Payyambalam Beach, Kannur" },
 ];
 
-function HomeView({ setCurrentTab, isAdmin }) {
+function HomeView({ setCurrentTab, siteSettings }) {
   const [bgIndex, setBgIndex] = useState(0);
+  const [content, setContent] = useState(null);
+  const [newsArticles, setNewsArticles] = useState([]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -20,31 +20,19 @@ function HomeView({ setCurrentTab, isAdmin }) {
     return () => clearInterval(timer);
   }, []);
 
-  // Local state for editable content
-  const [heroTitle, setHeroTitle] = useState(() => sessionStorage.getItem("cms_home_title") || "Dedicated to the Growth of Kannur");
-  const [heroSubtitle, setHeroSubtitle] = useState(() => sessionStorage.getItem("cms_home_subtitle") || `Welcome to the official web portal of ${siteConfig.mlaName}. Together, let's build a smarter, healthier, and more prosperous constituency.`);
-  
-  const [stats, setStats] = useState(() => {
-    const saved = sessionStorage.getItem("cms_home_stats");
-    return saved ? JSON.parse(saved) : keyStats;
-  });
+  useEffect(() => {
+    api.get("/api/content/home").then((res) => setContent(res.data)).catch(() => setContent(null));
+    api.get("/api/content/news").then((res) => setNewsArticles(res.data.articles || [])).catch(() => setNewsArticles([]));
+  }, []);
 
-  // Sync to session storage
-  useEffect(() => sessionStorage.setItem("cms_home_title", heroTitle), [heroTitle]);
-  useEffect(() => sessionStorage.setItem("cms_home_subtitle", heroSubtitle), [heroSubtitle]);
-  useEffect(() => sessionStorage.setItem("cms_home_stats", JSON.stringify(stats)), [stats]);
-
-  const updateStat = (idx, field, newValue) => {
-    const newStats = [...stats];
-    newStats[idx][field] = newValue;
-    setStats(newStats);
-  };
   const quickActions = [
     { title: "Submit Grievance", desc: "File public petitions or raise local issues", icon: FileText, tab: "/contact", color: "bg-blue-50 text-blue-600 border-blue-100" },
     { title: "Welfare Schemes", desc: "Find eligibility and register for local benefits", icon: Award, tab: "/schemes", color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
     { title: "Development Works", desc: "Track road, sports, and infrastructure progress", icon: Settings, tab: "/development", color: "bg-amber-50 text-amber-600 border-amber-100" },
     { title: "Meet the MLA", desc: "View Camp office details and public hours", icon: Users, tab: "/contact", color: "bg-purple-50 text-purple-600 border-purple-100" }
   ];
+
+  if (!content) return null;
 
   return (
     <div className="space-y-16 py-8">
@@ -63,28 +51,17 @@ function HomeView({ setCurrentTab, isAdmin }) {
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/85 to-slate-900/30 z-1"></div>
         <div className="absolute -right-20 -top-20 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl"></div>
         <div className="absolute right-10 bottom-10 h-72 w-72 rounded-full bg-teal-500/10 blur-3xl"></div>
-        
+
         <div className="relative z-10 mx-auto max-w-7xl px-8 py-12 sm:py-14 lg:py-16 lg:grid lg:grid-cols-2 lg:gap-8 items-center">
           <div className="space-y-6">
             <span className="inline-flex items-center space-x-2 rounded-full bg-emerald-500/10 px-3 py-1 text-sm font-semibold text-emerald-400 border border-emerald-500/20">
               <span>Democratic Representation</span>
             </span>
             <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl bg-gradient-to-r from-white via-slate-100 to-emerald-200 bg-clip-text text-transparent pb-1">
-              <EditableText
-                value={heroTitle}
-                onSave={setHeroTitle}
-                isAdmin={isAdmin}
-                inputClassName="text-xl font-bold bg-white/10 border-white/30 text-slate-800"
-              />
+              {content.heroTitle}
             </h2>
             <p className="max-w-md text-lg text-slate-300">
-              <EditableText
-                value={heroSubtitle}
-                onSave={setHeroSubtitle}
-                isAdmin={isAdmin}
-                multiline={true}
-                inputClassName="text-sm font-normal bg-white/10 border-white/30 text-slate-800"
-              />
+              {content.heroSubtitle}
             </p>
             <div className="flex flex-wrap gap-4">
               <button
@@ -102,14 +79,14 @@ function HomeView({ setCurrentTab, isAdmin }) {
               </button>
             </div>
           </div>
-          
+
           {/* Hero Image Side */}
           <div className="mt-10 lg:mt-0 flex justify-center lg:justify-end">
             <div className="relative group">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-500 opacity-20 blur-xl group-hover:opacity-30 transition"></div>
               <img
                 src="mla.jpg"
-                alt={siteConfig.mlaName}
+                alt={siteSettings?.mlaName}
                 className="relative z-10 w-64 h-72 sm:w-72 sm:h-80 object-cover rounded-2xl border-4 border-slate-800 shadow-2xl"
               />
             </div>
@@ -120,17 +97,13 @@ function HomeView({ setCurrentTab, isAdmin }) {
       {/* Stats Counter Section */}
       <section className="bg-white rounded-3xl border border-emerald-50 p-8 shadow-xs">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-emerald-100">
-          {stats.map((stat, idx) => (
+          {content.stats.map((stat, idx) => (
             <div key={idx} className="flex flex-col items-center text-center p-4">
               <span className="text-3xl font-extrabold text-slate-800 bg-gradient-to-r from-emerald-600 to-teal-700 bg-clip-text text-transparent">
-                <EditableText value={stat.value} onSave={(val) => updateStat(idx, "value", val)} isAdmin={isAdmin} />
+                {stat.value}
               </span>
-              <span className="text-sm font-bold text-slate-700 mt-1">
-                <EditableText value={stat.label} onSave={(val) => updateStat(idx, "label", val)} isAdmin={isAdmin} />
-              </span>
-              <span className="text-xs text-slate-500 mt-1">
-                <EditableText value={stat.desc} onSave={(val) => updateStat(idx, "desc", val)} isAdmin={isAdmin} multiline={true} />
-              </span>
+              <span className="text-sm font-bold text-slate-700 mt-1">{stat.label}</span>
+              <span className="text-xs text-slate-500 mt-1">{stat.desc}</span>
             </div>
           ))}
         </div>

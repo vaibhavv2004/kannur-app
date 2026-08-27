@@ -1,28 +1,17 @@
 import { useState, useEffect } from "react";
-import { developmentProjects } from "../../constants/data";
 import { CircleCheck, Clock, ShieldAlert } from "lucide-react";
-import EditableText from "../common/EditableText";
 import PageHeader from "../common/PageHeader";
+import { api } from "../../lib/api";
 
-function DevelopmentView({ isAdmin }) {
+function DevelopmentView() {
   const [filter, setFilter] = useState("All");
-  
-  const [projects, setProjects] = useState(() => {
-    const saved = sessionStorage.getItem("cms_dev_projects");
-    return saved ? JSON.parse(saved) : developmentProjects;
-  });
+  const [content, setContent] = useState(null);
 
-  useEffect(() => sessionStorage.setItem("cms_dev_projects", JSON.stringify(projects)), [projects]);
-
-  const updateProject = (id, field, val) => {
-    setProjects(prev => prev.map(p => p.id === id ? { ...p, [field]: val } : p));
-  };
+  useEffect(() => {
+    api.get("/api/content/development").then((res) => setContent(res.data)).catch(() => setContent(null));
+  }, []);
 
   const categories = ["All", "Infrastructure", "Healthcare", "Sports", "Tourism", "Education"];
-
-  const filteredProjects = filter === "All"
-    ? projects
-    : projects.filter(p => p.category === filter);
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -46,13 +35,19 @@ function DevelopmentView({ isAdmin }) {
     }
   };
 
+  if (!content) return null;
+
+  const filteredProjects = filter === "All"
+    ? content.projects
+    : content.projects.filter(p => p.category === filter);
+
   return (
     <div className="space-y-8 py-8">
       {/* Page Header */}
       <div className="border-b border-slate-100 pb-4 flex flex-col sm:flex-row justify-between items-center gap-4">
         <PageHeader bordered={false} title="Development Projects" description="Track infrastructure works and community progress across the constituency." />
         <div className="flex h-10 items-center justify-center rounded-lg bg-emerald-500/10 px-4 text-sm font-semibold text-emerald-700">
-          <span>Active Funds Allocated: ₹94.5 Cr</span>
+          <span>Active Funds Allocated: {content.activeFundsAllocated}</span>
         </div>
       </div>
 
@@ -85,12 +80,8 @@ function DevelopmentView({ isAdmin }) {
                   <span>{project.status}</span>
                 </div>
               </div>
-              <h4 className="font-extrabold text-slate-800 text-lg leading-tight">
-                <EditableText value={project.title} onSave={(val) => updateProject(project.id, "title", val)} isAdmin={isAdmin} />
-              </h4>
-              <p className="text-slate-500 text-xs leading-relaxed">
-                <EditableText value={project.desc} onSave={(val) => updateProject(project.id, "desc", val)} isAdmin={isAdmin} multiline={true} />
-              </p>
+              <h4 className="font-extrabold text-slate-800 text-lg leading-tight">{project.title}</h4>
+              <p className="text-slate-500 text-xs leading-relaxed">{project.desc}</p>
             </div>
 
             <div className="space-y-3 pt-4 border-t border-slate-50">

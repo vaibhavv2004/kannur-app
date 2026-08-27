@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { offices } from "../../constants/data";
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle, LogOut, UserCircle2, Inbox } from "lucide-react";
 import { api } from "../../lib/api";
 import { getStatusColor } from "../../lib/grievanceStatus";
@@ -28,6 +27,11 @@ function ContactView({ isCitizenLoggedIn, citizenToken, citizenName, onCitizenLo
 
   const [myGrievances, setMyGrievances] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [offices, setOffices] = useState([]);
+
+  useEffect(() => {
+    api.get("/api/content/contact").then((res) => setOffices(res.data.offices || [])).catch(() => setOffices([]));
+  }, []);
 
   useEffect(() => {
     if (viewMode !== "history" || !citizenToken) return;

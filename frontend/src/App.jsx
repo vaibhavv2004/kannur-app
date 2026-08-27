@@ -13,28 +13,7 @@ import ContactView from "./components/views/ContactView";
 import AdminView from "./components/views/AdminView";
 import AdminLoginView from "./components/views/AdminLoginView";
 import LegislativeView from "./components/views/LegislativeView";
-import { initialAssemblyAttendance, initialAssemblyQuestions } from "./constants/data";
 import { api } from "./lib/api";
-
-function getInitialAttendance() {
-  try {
-    const saved = sessionStorage.getItem("mla_attendance");
-    if (saved) return JSON.parse(saved);
-  } catch {
-    // ignore malformed sessionStorage value
-  }
-  return initialAssemblyAttendance;
-}
-
-function getInitialQuestions() {
-  try {
-    const saved = sessionStorage.getItem("mla_questions");
-    if (saved) return JSON.parse(saved);
-  } catch {
-    // ignore malformed sessionStorage value
-  }
-  return initialAssemblyQuestions;
-}
 
 function App() {
   const location = useLocation();
@@ -48,23 +27,14 @@ function App() {
     () => sessionStorage.getItem("mla_citizen_token") || null
   );
   const [citizenName, setCitizenName] = useState("");
+  const [siteSettings, setSiteSettings] = useState(null);
 
   const isAdminLoggedIn = !!adminToken;
   const isCitizenLoggedIn = !!citizenToken;
 
   const [grievances, setGrievances] = useState([]);
-  const [attendance, setAttendance] = useState(getInitialAttendance);
-  const [questions, setQuestions] = useState(getInitialQuestions);
 
   // --- Sync side effects OUTSIDE state updaters (React Strict Mode safe) ---
-  useEffect(() => {
-    sessionStorage.setItem("mla_attendance", JSON.stringify(attendance));
-  }, [attendance]);
-
-  useEffect(() => {
-    sessionStorage.setItem("mla_questions", JSON.stringify(questions));
-  }, [questions]);
-
   useEffect(() => {
     if (adminToken) sessionStorage.setItem("mla_admin_token", adminToken);
     else sessionStorage.removeItem("mla_admin_token");
@@ -74,6 +44,11 @@ function App() {
     if (citizenToken) sessionStorage.setItem("mla_citizen_token", citizenToken);
     else sessionStorage.removeItem("mla_citizen_token");
   }, [citizenToken]);
+
+  // Site-wide settings (name, contact, social links) — fetched once, public.
+  useEffect(() => {
+    api.get("/api/content/site_settings").then((res) => setSiteSettings(res.data)).catch(() => setSiteSettings(null));
+  }, []);
 
   const refreshGrievances = useCallback(async () => {
     if (!adminToken) return;
@@ -133,7 +108,7 @@ function App() {
 
   // Admin login full-screen (no header/footer)
   if (currentTab === "/admin-login") {
-    return <AdminLoginView onLoginSuccess={handleLogin} />;
+    return <AdminLoginView onLoginSuccess={handleLogin} siteSettings={siteSettings} />;
   }
 
   return (
@@ -148,17 +123,18 @@ function App() {
           isCitizenLoggedIn={isCitizenLoggedIn}
           citizenName={citizenName}
           onCitizenLogout={handleCitizenLogout}
+          siteSettings={siteSettings}
         />
         <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
           <Routes>
-            <Route path="/" element={<HomeView setCurrentTab={handleAdminNavigation} isAdmin={isAdminLoggedIn} />} />
-            <Route path="/about" element={<AboutView isAdmin={isAdminLoggedIn} />} />
-            <Route path="/constituency" element={<ConstituencyView isAdmin={isAdminLoggedIn} />} />
-            <Route path="/legislative" element={<LegislativeView attendance={attendance} questions={questions} isAdmin={isAdminLoggedIn} />} />
-            <Route path="/development" element={<DevelopmentView isAdmin={isAdminLoggedIn} />} />
-            <Route path="/news" element={<NewsView isAdmin={isAdminLoggedIn} />} />
+            <Route path="/" element={<HomeView setCurrentTab={handleAdminNavigation} siteSettings={siteSettings} />} />
+            <Route path="/about" element={<AboutView />} />
+            <Route path="/constituency" element={<ConstituencyView />} />
+            <Route path="/legislative" element={<LegislativeView />} />
+            <Route path="/development" element={<DevelopmentView />} />
+            <Route path="/news" element={<NewsView />} />
             <Route path="/gallery" element={<GalleryView />} />
-            <Route path="/schemes" element={<SchemesView isAdmin={isAdminLoggedIn} />} />
+            <Route path="/schemes" element={<SchemesView />} />
             <Route
               path="/contact"
               element={
@@ -178,18 +154,16 @@ function App() {
                   ? <AdminView
                       adminToken={adminToken}
                       grievances={grievances} refreshGrievances={refreshGrievances}
-                      attendance={attendance} setAttendance={setAttendance}
-                      questions={questions} setQuestions={setQuestions}
                       onLogout={handleLogout}
                     />
-                  : <AdminLoginView onLoginSuccess={handleLogin} />
+                  : <AdminLoginView onLoginSuccess={handleLogin} siteSettings={siteSettings} />
               }
             />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
       </div>
-      <Footer setCurrentTab={handleAdminNavigation} currentTab={currentTab} />
+      <Footer setCurrentTab={handleAdminNavigation} currentTab={currentTab} siteSettings={siteSettings} />
     </div>
   );
 }

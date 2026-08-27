@@ -1,7 +1,18 @@
+import { useState, useEffect } from "react";
 import { Award, BookOpen, Search, HelpCircle } from "lucide-react";
 import PageHeader from "../common/PageHeader";
+import { api } from "../../lib/api";
 
-function LegislativeView({ attendance, questions }) {
+function LegislativeView() {
+  const [content, setContent] = useState(null);
+
+  useEffect(() => {
+    api.get("/api/content/legislative").then((res) => setContent(res.data)).catch(() => setContent(null));
+  }, []);
+
+  if (!content) return null;
+
+  const { attendance, questions } = content;
   const attendancePercentage = attendance.totalSessions > 0
     ? Math.round((attendance.daysAttended / attendance.totalSessions) * 100)
     : 0;

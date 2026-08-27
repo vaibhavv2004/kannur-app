@@ -1,23 +1,17 @@
 import { useState, useEffect } from "react";
-import { mlaProfile } from "../../constants/data";
 import { Award, BookOpen, Heart, Calendar } from "lucide-react";
-import EditableText from "../common/EditableText";
 import PageHeader from "../common/PageHeader";
+import { api } from "../../lib/api";
 
-function AboutView({ isAdmin }) {
-  const [profile, setProfile] = useState(() => {
-    const saved = sessionStorage.getItem("cms_about_profile");
-    return saved ? JSON.parse(saved) : mlaProfile;
-  });
+function AboutView() {
+  const [profile, setProfile] = useState(null);
 
-  useEffect(() => sessionStorage.setItem("cms_about_profile", JSON.stringify(profile)), [profile]);
+  useEffect(() => {
+    api.get("/api/content/about").then((res) => setProfile(res.data)).catch(() => setProfile(null));
+  }, []);
 
-  const updateProfile = (field, val) => setProfile(p => ({ ...p, [field]: val }));
-  const updateMilestone = (idx, field, val) => {
-    const newM = [...profile.milestones];
-    newM[idx][field] = val;
-    setProfile(p => ({ ...p, milestones: newM }));
-  };
+  if (!profile) return null;
+
   return (
     <div className="space-y-12 py-8">
       {/* Page Header */}
@@ -32,20 +26,16 @@ function AboutView({ isAdmin }) {
               <span>Political Profile & Background</span>
             </h3>
             <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line">
-              <EditableText value={profile.bio} onSave={(val) => updateProfile("bio", val)} isAdmin={isAdmin} multiline={true} />
+              {profile.bio}
             </p>
             <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-100">
               <div>
                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Party Affiliation</span>
-                <p className="text-sm font-bold text-slate-800">
-                  <EditableText value={profile.party} onSave={(val) => updateProfile("party", val)} isAdmin={isAdmin} />
-                </p>
+                <p className="text-sm font-bold text-slate-800">{profile.party}</p>
               </div>
               <div>
                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Education</span>
-                <p className="text-sm font-bold text-slate-800">
-                  <EditableText value={profile.education} onSave={(val) => updateProfile("education", val)} isAdmin={isAdmin} />
-                </p>
+                <p className="text-sm font-bold text-slate-800">{profile.education}</p>
               </div>
             </div>
           </div>
@@ -56,7 +46,7 @@ function AboutView({ isAdmin }) {
               <span>Vision Statement</span>
             </h3>
             <p className="text-emerald-100 text-sm leading-relaxed">
-              "<EditableText value={profile.vision} onSave={(val) => updateProfile("vision", val)} isAdmin={isAdmin} multiline={true} />"
+              "{profile.vision}"
             </p>
           </div>
         </div>
@@ -93,17 +83,17 @@ function AboutView({ isAdmin }) {
             <div key={idx} className="relative pl-6 sm:pl-8">
               {/* Timeline Indicator Dot */}
               <div className="absolute -left-1.5 top-1.5 h-3 w-3 rounded-full border border-emerald-600 bg-white"></div>
-              
+
               {/* Milestone Content */}
               <div className="flex flex-col md:flex-row md:items-start gap-1 md:gap-8">
                 {/* Year Label */}
                 <div className="md:absolute md:-left-32 md:w-24 md:text-right font-black text-emerald-600 text-lg">
-                  <EditableText value={milestone.year} onSave={(val) => updateMilestone(idx, "year", val)} isAdmin={isAdmin} />
+                  {milestone.year}
                 </div>
-                
+
                 {/* Event details */}
                 <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 w-full text-sm text-slate-700 font-semibold shadow-xs">
-                  <EditableText value={milestone.event} onSave={(val) => updateMilestone(idx, "event", val)} isAdmin={isAdmin} multiline={true} />
+                  {milestone.event}
                 </div>
               </div>
             </div>

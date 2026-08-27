@@ -1,15 +1,22 @@
-import { useState } from "react";
-import { newsArticles, upcomingEvents } from "../../constants/data";
+import { useState, useEffect } from "react";
 import { Search, Calendar, Clock, MapPin, ChevronRight } from "lucide-react";
 import PageHeader from "../common/PageHeader";
+import { api } from "../../lib/api";
 
 function NewsView() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
+  const [content, setContent] = useState(null);
+
+  useEffect(() => {
+    api.get("/api/content/news").then((res) => setContent(res.data)).catch(() => setContent(null));
+  }, []);
 
   const categories = ["All", "Health", "Culture", "Infrastructure", "Education"];
 
-  const filteredNews = newsArticles.filter((article) => {
+  if (!content) return null;
+
+  const filteredNews = content.articles.filter((article) => {
     const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       article.summary.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = activeCategory === "All" || article.category === activeCategory;
@@ -104,7 +111,7 @@ function NewsView() {
           <h3 className="text-xl font-bold text-slate-850 border-b border-slate-50 pb-2">Upcoming Events</h3>
           
           <div className="space-y-4">
-            {upcomingEvents.map((event) => (
+            {content.events.map((event) => (
               <div key={event.id} className="bg-slate-90 rounded-2xl p-5 border border-slate-100 flex gap-4 hover:shadow-sm transition">
                 {/* Calendar Icon Visual Date */}
                 <div className="flex flex-col items-center justify-center bg-emerald-600 text-white rounded-xl h-14 w-14 shrink-0 shadow-sm">
