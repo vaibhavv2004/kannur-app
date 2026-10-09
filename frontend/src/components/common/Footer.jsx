@@ -1,12 +1,14 @@
+import { useTranslation } from "react-i18next";
 import { Landmark, Mail, Phone, MapPin, ArrowRight } from "lucide-react";
 import navigation from "../../constants/navigation";
 
 function Footer({ setCurrentTab, siteSettings }) {
+  const { t } = useTranslation();
   const social = siteSettings?.social || {};
   const office = siteSettings?.office || {};
   const handleSubscribe = (e) => {
     e.preventDefault();
-    alert("Thank you for subscribing to updates!");
+    alert(t("footer.subscribeThanks"));
     e.target.reset();
   };
 
@@ -23,7 +25,7 @@ function Footer({ setCurrentTab, siteSettings }) {
               <span className="font-bold text-lg">{siteSettings?.siteName}</span>
             </div>
             <p className="text-sm text-slate-400">
-              Connecting the citizens of {siteSettings?.constituency} directly with their representative for progressive development and collective growth.
+              {t("footer.connectingCitizens", { constituency: siteSettings?.constituency })}
             </p>
             <div className="flex space-x-4 pt-2">
               <a href={social.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition" aria-label="Facebook">
@@ -54,7 +56,7 @@ function Footer({ setCurrentTab, siteSettings }) {
 
           {/* Quick Links Column */}
           <div>
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Quick Links</h3>
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">{t("footer.quickLinks")}</h3>
             <ul className="space-y-2">
               {navigation.slice(0, 5).map((item) => (
                 <li key={item.id}>
@@ -62,7 +64,7 @@ function Footer({ setCurrentTab, siteSettings }) {
                     onClick={() => setCurrentTab(item.path)}
                     className="text-sm hover:text-emerald-400 hover:underline transition cursor-pointer"
                   >
-                    {item.label}
+                    {t(`nav.${item.key}`)}
                   </button>
                 </li>
               ))}
@@ -71,7 +73,7 @@ function Footer({ setCurrentTab, siteSettings }) {
 
           {/* Support / Contact Links */}
           <div>
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Contact Info</h3>
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">{t("footer.contactInfo")}</h3>
             <ul className="space-y-3">
               <li className="flex items-start space-x-3 text-sm">
                 <MapPin className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
@@ -90,15 +92,15 @@ function Footer({ setCurrentTab, siteSettings }) {
 
           {/* Newsletter Column */}
           <div>
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Newsletter</h3>
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">{t("footer.newsletter")}</h3>
             <p className="text-sm text-slate-400 mb-4">
-              Subscribe to receive development progress reports and announcement alerts directly in your inbox.
+              {t("footer.newsletterDesc")}
             </p>
             <form onSubmit={handleSubscribe} className="flex">
               <input
                 type="email"
                 required
-                placeholder="Enter email address"
+                placeholder={t("footer.subscribePlaceholder")}
                 className="w-full rounded-l-lg bg-slate-800 border-0 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               />
               <button
@@ -112,7 +114,7 @@ function Footer({ setCurrentTab, siteSettings }) {
         </div>
 
         <div className="mt-12 border-t border-slate-800 pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-4">
-          <p>© {new Date().getFullYear()} {siteSettings?.mlaName}. All rights reserved.</p>
+          <p>{t("footer.copyright", { year: new Date().getFullYear(), name: siteSettings?.mlaName })}</p>
 
           <div className="flex items-center gap-4">
             {/* User Panel Button — visible only when in Admin area */}
@@ -120,7 +122,7 @@ function Footer({ setCurrentTab, siteSettings }) {
               onClick={() => setCurrentTab("/")}
               className="hover:text-emerald-400 font-bold underline transition cursor-pointer"
             >
-              ← User Panel
+              {t("footer.userPanel")}
             </button>
 
             {/* Admin Portal Button */}
@@ -128,11 +130,11 @@ function Footer({ setCurrentTab, siteSettings }) {
               onClick={() => setCurrentTab("/admin")}
               className="hover:text-emerald-400 font-bold underline transition cursor-pointer"
             >
-              Admin Portal
+              {t("footer.adminPortal")}
             </button>
           </div>
 
-          <p>Designed &amp; Maintained by constituency IT cell.</p>
+          <p>{t("footer.designedBy")}</p>
         </div>
       </div>
     </footer>

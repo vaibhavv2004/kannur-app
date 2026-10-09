@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { CircleCheck, Clock, ShieldAlert } from "lucide-react";
 import PageHeader from "../common/PageHeader";
 import { api } from "../../lib/api";
 
 function DevelopmentView() {
+  const { t } = useTranslation();
   const [filter, setFilter] = useState("All");
-  const [content, setContent] = useState(null);
+  const [pageData, setPageData] = useState(null);
 
   useEffect(() => {
-    api.get("/api/content/development").then((res) => setContent(res.data)).catch(() => setContent(null));
+    api.get("/api/content/development").then((res) => setPageData(res.data)).catch(() => setPageData(null));
   }, []);
 
   const categories = ["All", "Infrastructure", "Healthcare", "Sports", "Tourism", "Education"];
@@ -35,6 +37,8 @@ function DevelopmentView() {
     }
   };
 
+  const content = pageData;
+
   if (!content) return null;
 
   const filteredProjects = filter === "All"
@@ -45,9 +49,9 @@ function DevelopmentView() {
     <div className="space-y-8 py-8">
       {/* Page Header */}
       <div className="border-b border-slate-100 pb-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <PageHeader bordered={false} title="Development Projects" description="Track infrastructure works and community progress across the constituency." />
+        <PageHeader bordered={false} title={t("development.pageTitle")} description={t("development.pageDesc")} />
         <div className="flex h-10 items-center justify-center rounded-lg bg-emerald-500/10 px-4 text-sm font-semibold text-emerald-700">
-          <span>Active Funds Allocated: {content.activeFundsAllocated}</span>
+          <span>{t("development.activeFundsAllocated", { amount: content.activeFundsAllocated })}</span>
         </div>
       </div>
 
@@ -63,7 +67,7 @@ function DevelopmentView() {
                 : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
             }`}
           >
-            {cat}
+            {t(`development.categories.${cat}`)}
           </button>
         ))}
       </div>
@@ -74,10 +78,10 @@ function DevelopmentView() {
           <div key={project.id} className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-6 hover:shadow-md transition">
             <div className="space-y-3">
               <div className="flex justify-between items-start gap-4">
-                <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">{project.category}</span>
+                <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">{t(`development.categories.${project.category}`, project.category)}</span>
                 <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-xs font-semibold ${getStatusStyle(project.status)}`}>
                   {getStatusIcon(project.status)}
-                  <span>{project.status}</span>
+                  <span>{t(`development.statusLabels.${project.status}`, project.status)}</span>
                 </div>
               </div>
               <h4 className="font-extrabold text-slate-800 text-lg leading-tight">{project.title}</h4>
@@ -86,7 +90,7 @@ function DevelopmentView() {
 
             <div className="space-y-3 pt-4 border-t border-slate-50">
               <div className="flex justify-between items-center text-xs">
-                <span className="text-slate-400 font-medium">Progress</span>
+                <span className="text-slate-400 font-medium">{t("development.progress")}</span>
                 <span className="text-slate-800 font-bold">{project.progress}%</span>
               </div>
               {/* Progress Bar Container */}
@@ -97,7 +101,7 @@ function DevelopmentView() {
                 ></div>
               </div>
               <div className="flex justify-between items-center text-xs pt-1">
-                <span className="text-slate-400 font-medium">Allocated Budget</span>
+                <span className="text-slate-400 font-medium">{t("development.allocatedBudget")}</span>
                 <span className="text-slate-800 font-bold">{project.budget}</span>
               </div>
             </div>

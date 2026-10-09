@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { X, ZoomIn, PlayCircle } from "lucide-react";
 import { api } from "../../lib/api";
 import PageHeader from "../common/PageHeader";
@@ -9,6 +10,7 @@ function extractYouTubeId(url) {
 }
 
 function GalleryView() {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [filter, setFilter] = useState("All");
   const [selectedItem, setSelectedItem] = useState(null);
@@ -26,7 +28,7 @@ function GalleryView() {
   return (
     <div className="space-y-8 py-8">
       {/* Page Header */}
-      <PageHeader title="Media Gallery" description="Glimpses of development projects, citizen interactions, and events in Kannur." />
+      <PageHeader title={t("gallery.pageTitle")} description={t("gallery.pageDesc")} />
 
       {/* Category Tabs */}
       <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
@@ -40,7 +42,7 @@ function GalleryView() {
                 : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
             }`}
           >
-            {cat}
+            {cat === "All" ? t("gallery.all") : cat}
           </button>
         ))}
       </div>

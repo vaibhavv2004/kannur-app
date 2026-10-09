@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { LogIn, Eye, EyeOff, Lock, Mail, AlertCircle } from "lucide-react";
 import { api } from "../../lib/api";
 
 function CitizenLoginView({ onLoginSuccess, onSwitchToRegister }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -22,7 +24,7 @@ function CitizenLoginView({ onLoginSuccess, onSwitchToRegister }) {
       const { access_token } = await api.post("/api/auth/login", form);
       onLoginSuccess(access_token);
     } catch (err) {
-      setError(err.message || "Invalid email or password.");
+      setError(err.message || t("auth.invalidEmailPassword"));
     } finally {
       setIsLoading(false);
     }
@@ -34,8 +36,8 @@ function CitizenLoginView({ onLoginSuccess, onSwitchToRegister }) {
         <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md mx-auto">
           <LogIn className="h-6 w-6" />
         </div>
-        <h3 className="text-xl font-bold text-slate-800">Citizen Login</h3>
-        <p className="text-sm text-slate-500">Log in to submit a grievance or suggestion.</p>
+        <h3 className="text-xl font-bold text-slate-800">{t("auth.citizenLogin")}</h3>
+        <p className="text-sm text-slate-500">{t("auth.logInToSubmit")}</p>
       </div>
 
       {error && (
@@ -47,7 +49,7 @@ function CitizenLoginView({ onLoginSuccess, onSwitchToRegister }) {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-semibold text-slate-500 mb-1">Email Address</label>
+          <label className="block text-xs font-semibold text-slate-500 mb-1">{t("auth.emailAddress")}</label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
@@ -61,7 +63,7 @@ function CitizenLoginView({ onLoginSuccess, onSwitchToRegister }) {
           </div>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-500 mb-1">Password</label>
+          <label className="block text-xs font-semibold text-slate-500 mb-1">{t("auth.password")}</label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
@@ -86,14 +88,14 @@ function CitizenLoginView({ onLoginSuccess, onSwitchToRegister }) {
           disabled={isLoading}
           className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white font-semibold py-2.5 rounded-xl transition cursor-pointer"
         >
-          {isLoading ? "Logging in..." : "Log In"}
+          {isLoading ? t("auth.loggingIn") : t("auth.logIn")}
         </button>
       </form>
 
       <p className="text-center text-xs text-slate-500">
-        Don't have an account?{" "}
+        {t("auth.noAccount")}{" "}
         <button onClick={onSwitchToRegister} className="text-emerald-700 font-semibold hover:underline cursor-pointer">
-          Register here
+          {t("auth.registerHere")}
         </button>
       </p>
     </div>

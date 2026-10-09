@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { ArrowRight, ChevronRight, FileText, Settings, Award, Users } from "lucide-react";
 import SectionTitle from "../common/SectionTitle";
 import { api } from "../../lib/api";
@@ -9,9 +10,10 @@ const HERO_BACKGROUNDS = [
 ];
 
 function HomeView({ setCurrentTab, siteSettings }) {
+  const { t } = useTranslation();
   const [bgIndex, setBgIndex] = useState(0);
-  const [content, setContent] = useState(null);
-  const [newsArticles, setNewsArticles] = useState([]);
+  const [pageData, setPageData] = useState(null);
+  const [newsData, setNewsData] = useState(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -21,15 +23,18 @@ function HomeView({ setCurrentTab, siteSettings }) {
   }, []);
 
   useEffect(() => {
-    api.get("/api/content/home").then((res) => setContent(res.data)).catch(() => setContent(null));
-    api.get("/api/content/news").then((res) => setNewsArticles(res.data.articles || [])).catch(() => setNewsArticles([]));
+    api.get("/api/content/home").then((res) => setPageData(res.data)).catch(() => setPageData(null));
+    api.get("/api/content/news").then((res) => setNewsData(res.data)).catch(() => setNewsData(null));
   }, []);
 
+  const content = pageData;
+  const newsArticles = newsData?.articles || [];
+
   const quickActions = [
-    { title: "Submit Grievance", desc: "File public petitions or raise local issues", icon: FileText, tab: "/contact", color: "bg-blue-50 text-blue-600 border-blue-100" },
-    { title: "Welfare Schemes", desc: "Find eligibility and register for local benefits", icon: Award, tab: "/schemes", color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
-    { title: "Development Works", desc: "Track road, sports, and infrastructure progress", icon: Settings, tab: "/development", color: "bg-amber-50 text-amber-600 border-amber-100" },
-    { title: "Meet the MLA", desc: "View Camp office details and public hours", icon: Users, tab: "/contact", color: "bg-purple-50 text-purple-600 border-purple-100" }
+    { title: t("home.actions.grievanceTitle"), desc: t("home.actions.grievanceDesc"), icon: FileText, tab: "/contact", color: "bg-blue-50 text-blue-600 border-blue-100" },
+    { title: t("home.actions.schemesTitle"), desc: t("home.actions.schemesDesc"), icon: Award, tab: "/schemes", color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
+    { title: t("home.actions.developmentTitle"), desc: t("home.actions.developmentDesc"), icon: Settings, tab: "/development", color: "bg-amber-50 text-amber-600 border-amber-100" },
+    { title: t("home.actions.meetMlaTitle"), desc: t("home.actions.meetMlaDesc"), icon: Users, tab: "/contact", color: "bg-purple-50 text-purple-600 border-purple-100" }
   ];
 
   if (!content) return null;
@@ -55,7 +60,7 @@ function HomeView({ setCurrentTab, siteSettings }) {
         <div className="relative z-10 mx-auto max-w-7xl px-8 py-12 sm:py-14 lg:py-16 lg:grid lg:grid-cols-2 lg:gap-8 items-center">
           <div className="space-y-6">
             <span className="inline-flex items-center space-x-2 rounded-full bg-emerald-500/10 px-3 py-1 text-sm font-semibold text-emerald-400 border border-emerald-500/20">
-              <span>Democratic Representation</span>
+              <span>{t("home.badge")}</span>
             </span>
             <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl bg-gradient-to-r from-white via-slate-100 to-emerald-200 bg-clip-text text-transparent pb-1">
               {content.heroTitle}
@@ -68,14 +73,14 @@ function HomeView({ setCurrentTab, siteSettings }) {
                 onClick={() => setCurrentTab("/contact")}
                 className="flex items-center space-x-2 rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white shadow-lg shadow-emerald-900/30 hover:bg-emerald-700 transition cursor-pointer"
               >
-                <span>Submit Grievance</span>
+                <span>{t("home.submitGrievance")}</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
               <button
                 onClick={() => setCurrentTab("/about")}
                 className="flex items-center space-x-2 rounded-xl bg-slate-800 border border-slate-700 px-6 py-3 font-semibold text-white hover:bg-slate-750 transition cursor-pointer"
               >
-                <span>Read Biography</span>
+                <span>{t("home.readBiography")}</span>
               </button>
             </div>
           </div>
@@ -111,7 +116,7 @@ function HomeView({ setCurrentTab, siteSettings }) {
 
       {/* Quick Actions Grid */}
       <section className="space-y-6">
-        <SectionTitle title="Quick Citizen Portal" subtitle="Access digital services and updates instantly. Click any card to redirect to the respective tab." />
+        <SectionTitle title={t("home.quickPortalTitle")} subtitle={t("home.quickPortalSubtitle")} />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {quickActions.map((action, idx) => {
             const Icon = action.icon;
@@ -129,7 +134,7 @@ function HomeView({ setCurrentTab, siteSettings }) {
                   <p className="text-xs text-slate-500 leading-relaxed">{action.desc}</p>
                 </div>
                 <div className="flex items-center text-xs font-bold mt-4 opacity-70 group-hover:opacity-100 transition">
-                  <span>Open Portal</span>
+                  <span>{t("home.openPortal")}</span>
                   <ChevronRight className="h-3 w-3 ml-1 group-hover:translate-x-1 transition" />
                 </div>
               </div>
@@ -142,14 +147,14 @@ function HomeView({ setCurrentTab, siteSettings }) {
       <section className="space-y-6">
         <div className="flex justify-between items-end border-b border-slate-100 pb-4">
           <div>
-            <h3 className="text-2xl font-bold text-slate-850">Recent Activities</h3>
-            <p className="text-slate-500 text-sm">Stay updated with latest decisions and events in the constituency.</p>
+            <h3 className="text-2xl font-bold text-slate-850">{t("home.recentActivities")}</h3>
+            <p className="text-slate-500 text-sm">{t("home.recentActivitiesDesc")}</p>
           </div>
           <button
             onClick={() => setCurrentTab("/news")}
             className="flex items-center space-x-1 text-sm font-semibold text-emerald-600 hover:text-emerald-700 cursor-pointer"
           >
-            <span>View All News</span>
+            <span>{t("home.viewAllNews")}</span>
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>

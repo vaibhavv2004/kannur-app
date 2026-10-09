@@ -1,16 +1,12 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { UserPlus, AlertCircle, CheckCircle, Upload } from "lucide-react";
 import { api } from "../../lib/api";
 
-const ID_PROOF_TYPES = [
-  { value: "aadhaar", label: "Aadhaar Card" },
-  { value: "voter_id", label: "Voter ID" },
-  { value: "pan", label: "PAN Card" },
-  { value: "passport", label: "Passport" },
-  { value: "driving_licence", label: "Driving Licence" },
-];
+const ID_PROOF_TYPE_VALUES = ["aadhaar", "voter_id", "pan", "passport", "driving_licence"];
 
 function RegisterView({ onSwitchToLogin }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     full_name: "",
     phone: "",
@@ -31,7 +27,7 @@ function RegisterView({ onSwitchToLogin }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file) {
-      setError("Please upload your ID proof document.");
+      setError(t("auth.pleaseUploadIdProof"));
       return;
     }
     setIsLoading(true);
@@ -45,7 +41,7 @@ function RegisterView({ onSwitchToLogin }) {
       await api.postForm("/api/users/register", formData);
       setSubmitted(true);
     } catch (err) {
-      setError(err.message || "Registration failed. Please check your details and try again.");
+      setError(err.message || t("auth.registrationFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -55,13 +51,12 @@ function RegisterView({ onSwitchToLogin }) {
     return (
       <div className="max-w-md mx-auto bg-emerald-50 border border-emerald-200 rounded-2xl p-6 sm:p-8 text-center space-y-3">
         <CheckCircle className="h-12 w-12 text-emerald-600 mx-auto" />
-        <h4 className="text-lg font-bold text-emerald-800">Registration Submitted</h4>
+        <h4 className="text-lg font-bold text-emerald-800">{t("auth.registrationSubmitted")}</h4>
         <p className="text-slate-600 text-sm">
-          Your registration and ID proof have been submitted for admin verification. You'll be able to log in and
-          submit grievances once your account is approved.
+          {t("auth.registrationSubmittedDesc")}
         </p>
         <button onClick={onSwitchToLogin} className="text-emerald-700 font-semibold text-sm hover:underline cursor-pointer">
-          Back to Login
+          {t("auth.backToLogin")}
         </button>
       </div>
     );
@@ -73,10 +68,9 @@ function RegisterView({ onSwitchToLogin }) {
         <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md mx-auto">
           <UserPlus className="h-6 w-6" />
         </div>
-        <h3 className="text-xl font-bold text-slate-800">Citizen Registration</h3>
+        <h3 className="text-xl font-bold text-slate-800">{t("auth.citizenRegistration")}</h3>
         <p className="text-sm text-slate-500">
-          Register with a valid ID proof. Your account will be reviewed and approved by our office before you can
-          submit grievances.
+          {t("auth.registerWithValidId")}
         </p>
       </div>
 
@@ -89,7 +83,7 @@ function RegisterView({ onSwitchToLogin }) {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-semibold text-slate-500 mb-1">Full Name *</label>
+          <label className="block text-xs font-semibold text-slate-500 mb-1">{t("auth.fullName")}</label>
           <input
             type="text" name="full_name" required value={form.full_name} onChange={handleChange}
             className="w-full text-sm rounded-lg border border-slate-200 p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -97,14 +91,14 @@ function RegisterView({ onSwitchToLogin }) {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-500 mb-1">Mobile Number *</label>
+            <label className="block text-xs font-semibold text-slate-500 mb-1">{t("auth.mobileNumber")}</label>
             <input
               type="tel" name="phone" required value={form.phone} onChange={handleChange}
               className="w-full text-sm rounded-lg border border-slate-200 p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 mb-1">Email Address *</label>
+            <label className="block text-xs font-semibold text-slate-500 mb-1">{t("auth.emailAddressRequired")}</label>
             <input
               type="email" name="email" required value={form.email} onChange={handleChange}
               className="w-full text-sm rounded-lg border border-slate-200 p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -112,26 +106,26 @@ function RegisterView({ onSwitchToLogin }) {
           </div>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-500 mb-1">Password *</label>
+          <label className="block text-xs font-semibold text-slate-500 mb-1">{t("auth.passwordRequired")}</label>
           <input
             type="password" name="password" required minLength={8} value={form.password} onChange={handleChange}
             className="w-full text-sm rounded-lg border border-slate-200 p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-500 mb-1">ID Proof Type *</label>
+          <label className="block text-xs font-semibold text-slate-500 mb-1">{t("auth.idProofType")}</label>
           <select
             name="id_proof_type" value={form.id_proof_type} onChange={handleChange}
             className="w-full text-sm rounded-lg border border-slate-200 p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
           >
-            {ID_PROOF_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+            {ID_PROOF_TYPE_VALUES.map((v) => <option key={v} value={v}>{t(`auth.idProofTypes.${v}`)}</option>)}
           </select>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-500 mb-1">Upload ID Proof (JPEG, PNG, or PDF) *</label>
+          <label className="block text-xs font-semibold text-slate-500 mb-1">{t("auth.uploadIdProof")}</label>
           <label className="flex items-center gap-2 justify-center border-2 border-dashed border-slate-200 rounded-lg p-4 text-sm text-slate-500 cursor-pointer hover:border-emerald-400 hover:text-emerald-700 transition">
             <Upload className="h-4 w-4" />
-            <span>{file ? file.name : "Choose a file"}</span>
+            <span>{file ? file.name : t("auth.chooseFile")}</span>
             <input
               type="file"
               accept="image/jpeg,image/png,application/pdf"
@@ -145,14 +139,14 @@ function RegisterView({ onSwitchToLogin }) {
           disabled={isLoading}
           className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white font-semibold py-2.5 rounded-xl transition cursor-pointer"
         >
-          {isLoading ? "Submitting..." : "Submit Registration"}
+          {isLoading ? t("auth.submitting") : t("auth.submitRegistration")}
         </button>
       </form>
 
       <p className="text-center text-xs text-slate-500">
-        Already registered?{" "}
+        {t("auth.alreadyRegistered")}{" "}
         <button onClick={onSwitchToLogin} className="text-emerald-700 font-semibold hover:underline cursor-pointer">
-          Log in
+          {t("auth.logInLink")}
         </button>
       </p>
     </div>

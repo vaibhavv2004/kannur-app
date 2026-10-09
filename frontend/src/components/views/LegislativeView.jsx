@@ -1,14 +1,18 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Award, BookOpen, Search, HelpCircle } from "lucide-react";
 import PageHeader from "../common/PageHeader";
 import { api } from "../../lib/api";
 
 function LegislativeView() {
-  const [content, setContent] = useState(null);
+  const { t } = useTranslation();
+  const [pageData, setPageData] = useState(null);
 
   useEffect(() => {
-    api.get("/api/content/legislative").then((res) => setContent(res.data)).catch(() => setContent(null));
+    api.get("/api/content/legislative").then((res) => setPageData(res.data)).catch(() => setPageData(null));
   }, []);
+
+  const content = pageData;
 
   if (!content) return null;
 
@@ -20,10 +24,10 @@ function LegislativeView() {
   return (
     <div className="space-y-12 py-8 animate-in fade-in duration-300">
       {/* Page Header */}
-      <PageHeader title="Legislative Assembly Performance" description="Tracking the MLA's attendance, active participation, and key questions raised in the State Assembly." />
+      <PageHeader title={t("legislative.pageTitle")} description={t("legislative.pageDesc")} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         {/* Left Column: Attendance Visualizer */}
         <div className="lg:col-span-1 space-y-6">
           <div className="bg-white rounded-3xl border border-slate-100 p-8 shadow-xs flex flex-col items-center text-center space-y-6 relative overflow-hidden">
@@ -33,8 +37,8 @@ function LegislativeView() {
             </div>
 
             <div className="space-y-1 z-10">
-              <h3 className="text-lg font-bold text-slate-800">Assembly Attendance</h3>
-              <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Current Session Performance</p>
+              <h3 className="text-lg font-bold text-slate-800">{t("legislative.attendanceHeading")}</h3>
+              <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">{t("legislative.currentSessionPerformance")}</p>
             </div>
 
             {/* CSS Radial Progress */}
@@ -71,11 +75,11 @@ function LegislativeView() {
             <div className="grid grid-cols-2 gap-4 w-full z-10 pt-4 border-t border-slate-100">
               <div>
                 <span className="block text-2xl font-bold text-slate-800">{attendance.daysAttended}</span>
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Days Attended</span>
+                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">{t("legislative.daysAttended")}</span>
               </div>
               <div>
                 <span className="block text-2xl font-bold text-slate-800">{attendance.totalSessions}</span>
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Total Sessions</span>
+                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">{t("legislative.totalSessions")}</span>
               </div>
             </div>
           </div>
@@ -86,10 +90,10 @@ function LegislativeView() {
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-emerald-600" />
-              <span>Questions Raised in Assembly</span>
+              <span>{t("legislative.questionsHeading")}</span>
             </h3>
             <span className="bg-slate-100 text-slate-600 px-3 py-1 text-xs font-bold rounded-full">
-              {questions.length} Questions
+              {t("legislative.questionsCount", { count: questions.length })}
             </span>
           </div>
 
@@ -100,17 +104,17 @@ function LegislativeView() {
                   <div className="absolute top-6 right-6 opacity-10 group-hover:opacity-20 group-hover:text-emerald-600 transition-all">
                     <HelpCircle className="h-12 w-12" />
                   </div>
-                  
+
                   <div className="space-y-3 relative z-10 pr-12">
                     <div className="flex items-center gap-3">
                       <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-black tracking-widest uppercase rounded">
                         {q.date}
                       </span>
-                      <span className="text-xs font-bold text-slate-400">Ref: {q.id}</span>
+                      <span className="text-xs font-bold text-slate-400">{t("legislative.ref", { id: q.id })}</span>
                     </div>
-                    
+
                     <h4 className="text-lg font-black text-slate-800 leading-snug">{q.topic}</h4>
-                    
+
                     <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100">
                       {q.summary}
                     </p>
@@ -120,7 +124,7 @@ function LegislativeView() {
             ) : (
               <div className="flex flex-col items-center justify-center p-12 bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400">
                 <Search className="h-10 w-10 opacity-30 mb-3" />
-                <p className="text-sm font-medium">No legislative questions recorded for this session yet.</p>
+                <p className="text-sm font-medium">{t("legislative.noQuestions")}</p>
               </div>
             )}
           </div>

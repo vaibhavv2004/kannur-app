@@ -1,0 +1,223 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "legislative": "Legislative",
+    "constituency": "Constituency",
+    "development": "Development",
+    "news": "News & Events",
+    "gallery": "Gallery",
+    "schemes": "Schemes",
+    "more": "More"
+  },
+  "header": {
+    "mlaSuffix": "MLA • {{constituency}} Constituency",
+    "contactOffice": "Contact Office",
+    "account": "Account",
+    "admin": "Admin",
+    "dashboard": "Dashboard",
+    "myGrievances": "My Grievances",
+    "logOut": "Log Out",
+    "citizenAdminLogin": "Citizen / Admin Login",
+    "adminDashboard": "Admin Dashboard"
+  },
+  "footer": {
+    "connectingCitizens": "Connecting the citizens of {{constituency}} directly with their representative for progressive development and collective growth.",
+    "quickLinks": "Quick Links",
+    "contactInfo": "Contact Info",
+    "newsletter": "Newsletter",
+    "newsletterDesc": "Subscribe to receive development progress reports and announcement alerts directly in your inbox.",
+    "subscribePlaceholder": "Enter email address",
+    "subscribeThanks": "Thank you for subscribing to updates!",
+    "copyright": "© {{year}} {{name}}. All rights reserved.",
+    "userPanel": "← User Panel",
+    "adminPortal": "Admin Portal",
+    "designedBy": "Designed & Maintained by constituency IT cell."
+  },
+  "home": {
+    "badge": "Democratic Representation",
+    "submitGrievance": "Submit Grievance",
+    "readBiography": "Read Biography",
+    "quickPortalTitle": "Quick Citizen Portal",
+    "quickPortalSubtitle": "Access digital services and updates instantly. Click any card to redirect to the respective tab.",
+    "openPortal": "Open Portal",
+    "recentActivities": "Recent Activities",
+    "recentActivitiesDesc": "Stay updated with latest decisions and events in the constituency.",
+    "viewAllNews": "View All News",
+    "actions": {
+      "grievanceTitle": "Submit Grievance",
+      "grievanceDesc": "File public petitions or raise local issues",
+      "schemesTitle": "Welfare Schemes",
+      "schemesDesc": "Find eligibility and register for local benefits",
+      "developmentTitle": "Development Works",
+      "developmentDesc": "Track road, sports, and infrastructure progress",
+      "meetMlaTitle": "Meet the MLA",
+      "meetMlaDesc": "View Camp office details and public hours"
+    }
+  },
+  "about": {
+    "pageTitle": "Biography & Vision",
+    "pageDesc": "Get to know your representative, their background, and vision for the future.",
+    "profileHeading": "Political Profile & Background",
+    "partyAffiliation": "Party Affiliation",
+    "education": "Education",
+    "visionHeading": "Vision Statement",
+    "rolesHeading": "Constituency Roles",
+    "legislativeRole": "Legislative Role",
+    "legislativeRoleDesc": "Raises local community concerns and drafts policies in the Kerala State Assembly.",
+    "publicRedressal": "Public Redressal",
+    "publicRedressalDesc": "Conducts regular camp office audiences to solve local issues directly.",
+    "milestonesHeading": "Milestones & Journey"
+  },
+  "constituency": {
+    "pageTitle": "Our Constituency: Kannur",
+    "pageDesc": "Explore the heritage, culture, and key facts of our historical assembly seat.",
+    "heritageHeading": "Cultural & Historical Heritage",
+    "quickFactsHeading": "Constituency Quick Facts",
+    "landmarksHeading": "Key Landmarks & Tourism"
+  },
+  "legislative": {
+    "pageTitle": "Legislative Assembly Performance",
+    "pageDesc": "Tracking the MLA's attendance, active participation, and key questions raised in the State Assembly.",
+    "attendanceHeading": "Assembly Attendance",
+    "currentSessionPerformance": "Current Session Performance",
+    "daysAttended": "Days Attended",
+    "totalSessions": "Total Sessions",
+    "questionsHeading": "Questions Raised in Assembly",
+    "questionsCount": "{{count}} Questions",
+    "noQuestions": "No legislative questions recorded for this session yet.",
+    "ref": "Ref: {{id}}"
+  },
+  "development": {
+    "pageTitle": "Development Projects",
+    "pageDesc": "Track infrastructure works and community progress across the constituency.",
+    "activeFundsAllocated": "Active Funds Allocated: {{amount}}",
+    "progress": "Progress",
+    "allocatedBudget": "Allocated Budget",
+    "statusLabels": {
+      "Completed": "Completed",
+      "In Progress": "In Progress"
+    },
+    "categories": {
+      "All": "All",
+      "Infrastructure": "Infrastructure",
+      "Healthcare": "Healthcare",
+      "Sports": "Sports",
+      "Tourism": "Tourism",
+      "Education": "Education"
+    }
+  },
+  "news": {
+    "pageTitle": "News & Events",
+    "pageDesc": "Stay updated with press statements, field visits, and upcoming schedules.",
+    "searchPlaceholder": "Search news...",
+    "latestAnnouncements": "Latest Announcements",
+    "noAnnouncements": "No announcements match your search.",
+    "upcomingEvents": "Upcoming Events",
+    "readFullPressRelease": "Read Full Press Release",
+    "categories": {
+      "All": "All",
+      "Health": "Health",
+      "Culture": "Culture",
+      "Infrastructure": "Infrastructure",
+      "Education": "Education"
+    }
+  },
+  "schemes": {
+    "pageTitle": "Welfare Schemes",
+    "pageDesc": "Search government support schemes, check eligibility, and learn how to apply.",
+    "searchPlaceholder": "Search schemes...",
+    "eligibilityCriteria": "Eligibility Criteria",
+    "welfareBenefits": "Welfare Benefits",
+    "howToApply": "How to Apply",
+    "noSchemesFound": "No welfare schemes found matching your filters.",
+    "clearSearch": "Clear Search",
+    "categories": {
+      "All": "All",
+      "Healthcare": "Healthcare",
+      "Education": "Education",
+      "Employment": "Employment",
+      "Agriculture": "Agriculture"
+    }
+  },
+  "contact": {
+    "pageTitle": "Contact & Public Grievances",
+    "pageDesc": "Submit your petitions, query requests, or schedule a meeting at the camp offices.",
+    "officeLocations": "Office Locations",
+    "loggedInAs": "Logged in as",
+    "logOut": "Log out",
+    "submitNew": "Submit New",
+    "mySubmissions": "My Submissions",
+    "loading": "Loading...",
+    "noSubmissionsYet": "You haven't submitted anything yet.",
+    "grievancePortal": "Public Grievance Portal",
+    "suggestAssemblyQuestion": "Suggest Assembly Question",
+    "grievanceTab": "Grievance",
+    "assemblyQuestionTab": "Assembly Question",
+    "issueCategory": "Issue Category *",
+    "subject": "Subject *",
+    "suggestedTopic": "Suggested Topic *",
+    "messageDetail": "Message Detail *",
+    "detailedQuestion": "Detailed Question/Reasoning *",
+    "submitGrievanceBtn": "Submit Grievance",
+    "submitQuestionBtn": "Submit Question Suggestion",
+    "submitting": "Submitting...",
+    "petitionFiledSuccess": "Petition Filed Successfully!",
+    "thankYouMessage": "Thank you for reaching out. Our office will review and update you soon.",
+    "somethingWentWrong": "Something went wrong. Please try again.",
+    "statusLabels": {
+      "Pending": "Pending",
+      "In Progress": "In Progress",
+      "Resolved": "Resolved"
+    },
+    "categories": {
+      "Infrastructure": "Infrastructure",
+      "Welfare Schemes": "Welfare Schemes",
+      "Water/Power Issue": "Water/Power Issue",
+      "Education": "Education",
+      "Healthcare": "Healthcare",
+      "Other": "Other"
+    }
+  },
+  "gallery": {
+    "pageTitle": "Media Gallery",
+    "pageDesc": "Glimpses of development projects, citizen interactions, and events in Kannur.",
+    "all": "All"
+  },
+  "auth": {
+    "citizenLogin": "Citizen Login",
+    "logInToSubmit": "Log in to submit a grievance or suggestion.",
+    "emailAddress": "Email Address",
+    "password": "Password",
+    "loggingIn": "Logging in...",
+    "logIn": "Log In",
+    "noAccount": "Don't have an account?",
+    "registerHere": "Register here",
+    "citizenRegistration": "Citizen Registration",
+    "registerWithValidId": "Register with a valid ID proof. Your account will be reviewed and approved by our office before you can submit grievances.",
+    "fullName": "Full Name *",
+    "mobileNumber": "Mobile Number *",
+    "emailAddressRequired": "Email Address *",
+    "passwordRequired": "Password *",
+    "idProofType": "ID Proof Type *",
+    "uploadIdProof": "Upload ID Proof (JPEG, PNG, or PDF) *",
+    "chooseFile": "Choose a file",
+    "submitRegistration": "Submit Registration",
+    "submitting": "Submitting...",
+    "alreadyRegistered": "Already registered?",
+    "logInLink": "Log in",
+    "registrationSubmitted": "Registration Submitted",
+    "registrationSubmittedDesc": "Your registration and ID proof have been submitted for admin verification. You'll be able to log in and submit grievances once your account is approved.",
+    "backToLogin": "Back to Login",
+    "idProofTypes": {
+      "aadhaar": "Aadhaar Card",
+      "voter_id": "Voter ID",
+      "pan": "PAN Card",
+      "passport": "Passport",
+      "driving_licence": "Driving Licence"
+    },
+    "pleaseUploadIdProof": "Please upload your ID proof document.",
+    "invalidEmailPassword": "Invalid email or password.",
+    "registrationFailed": "Registration failed. Please check your details and try again."
+  }
+}
